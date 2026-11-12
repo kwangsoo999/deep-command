@@ -16,7 +16,7 @@ Target: DEEP COMMAND 0.1.0 local-first alpha. Tested on Node 24.22.1, Python 3.1
 | 3D, pointer/raycast, layouts | NOT VERIFIED | actual browser/WebGL QA not run |
 | FPS/memory/Chrome/Firefox/Edge | NOT VERIFIED | no performance or cross-browser evidence |
 | Docker/PostgreSQL | NOT VERIFIED | configuration only; API tests use SQLite |
-| GitHub upload | BLOCKED | both GraphQL CreateRepository and REST POST user/repos denied by current integration; REST HTTP 403 Resource not accessible by integration |
+| GitHub access | VERIFIED | Owner created private repository kwangsoo999/deep-command; current integration reports pull/push permission. Remote upload is verified separately after push. |
 
 Build output after lazy loading: main JS ~282 KB (89 KB gzip), Three.js room chunk ~494 KB (127 KB gzip), CSS ~29 KB (8 KB gzip). These are bundle sizes, not network/FPS benchmarks. UI beep tested only by code/build, not audible playback. No browser preview server was started.
 
@@ -36,4 +36,4 @@ The managed Sites workflow requires `cua_repl.js`; no such callable tool was ava
 - Cloud API is optional and not connected to current local UI. API save payload checks are basic; public deployments need body caps, stronger deployment hardening and authoritative validation if adding competitive features.
 - Starlette TestClient reports one dependency deprecation warning about anyio.BlockingPortal; no test failure.
 
-No blanket “zero defects” claim is made. GitHub repository creation failed due to integration permissions, not an automatic approval-review rejection. An accessible empty repository from the owner is needed to finish upload.
+No blanket “zero defects” claim is made. Initial GitHub repository creation was denied by integration permissions. The owner subsequently created the private repository and enabled access; pull/push permissions have now been verified. Repository creation was not an automatic approval-review rejection.
