@@ -1,0 +1,25 @@
+# System architecture
+
+```mermaid
+flowchart LR
+ UI[React App] --> Store[Zustand store]
+ Timer[100ms scheduler] --> Clock[Fixed-step clock]
+ Clock --> Sim[Pure simulation and actions]
+ Sim --> Store
+ Store --> UI
+ Store --> Local[localStorage / JSON save]
+ UI --> Lazy[Lazy Three.js command room]
+ Optional[Optional API clients / Swagger] --> API[FastAPI]
+ API --> ORM[SQLAlchemy]
+ ORM --> DB[(SQLite dev / PostgreSQL config)]
+```
+
+API chưa được UI gọi; không ngụ ý mũi tên kết nối từ game tới cloud save. Nguồn truth runtime là `State` trong Zustand. UI gọi `dispatch` → clone state → `act`; scheduler gọi `advance` → `SimulationClock` → `step`. Render không chạy logic nhiệm vụ. Timestep 1 giây game, accumulator nhân tốc độ, delta bị chặn 0.5 giây để tránh catch-up vô hạn khi tab bị treo. Tab background không được bảo đảm thời gian thực.
+
+PRNG LCG lưu seed trong state. Cùng state và cùng chuỗi lệnh/tick cho cùng kết quả. Khi paused/planning, clock xóa phần tick lẻ. Save không lưu phần tick dưới một giây, vì vậy resume có thể lệch dưới một giây so với wall time; state game đầy đủ được khôi phục. Import/load luôn paused.
+
+Save schema `deep-command-v1` chứa state, campaign, resources, crew, contacts, intel, log, settings. `restore()` kiểm tra trường/biên chính trước khi gán. Không dùng save client làm dữ liệu đáng tin cậy cho multiplayer/leaderboard. Autosave 15 giây; thất bại lưu có toast. Source filename/schema version phải thay đổi có migration khi cấu trúc save đổi.
+
+Map SVG tương tác có transform pan/zoom, điểm chọn đổi từ screen sang SVG rồi nghịch đảo transform. Marker nhận pointer riêng. Các lớp trang trí có toggle. Boong WebGL lazy-loaded, cleanup animation frame, observer, listeners, geometry/material/renderer khi unmount. Cảnh chưa kiểm thử trực quan.
+
+Backend có auth scrypt với random salt, token opaque lưu SHA256 phía server, TTL 24h, query save ràng buộc player. CORS dùng allowlist. Rate limit auth là per-process. UI luôn nhãn local simulation để tránh hiểu nhầm dữ liệu API.
