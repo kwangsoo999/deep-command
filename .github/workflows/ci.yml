@@ -23,3 +23,23 @@ jobs:
           python-version: "3.12"
       - run: pip install -r backend/requirements.txt
       - run: pytest -q backend/test_api.py
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Test real HTTP cloud save round trip
+        shell: bash
+        run: |
+          export DATABASE_URL=sqlite:////tmp/deep-command-ci.db
+          python backend/init_db.py
+          python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8012 --no-access-log &
+          api_pid=$!
+          trap 'kill "$api_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:8012/health >/dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8012/health
+          VITE_TEST_API_URL=http://127.0.0.1:8012 npm exec vitest -- run tests/cloud.integration.test.ts

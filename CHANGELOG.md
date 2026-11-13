@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 — 2026-11-13
+
+- Added registration/login/logout UI and explicit cloud save/load through optional configured FastAPI.
+- Added atomic revision checks to prevent another device's save from being overwritten; DB columns and offline save v1 remain unchanged.
+- Added pre-import/pre-download local backup and recovery; storage failure preserves active state.
+- Added pre-parse API body limits for direct reverse-proxy deployments.
+- Added client timeout, session expiry handling, memory-only tokens and cloud busy/error/success states.
+- Added stronger save identity validation, client/component/API tests and real HTTP integration test in CI.
+- Added VITE_API_URL build/Compose configuration and cloud setup documentation.
+- Prepared Podman/PostgreSQL Quadlets and Cloudflare /api path routing for owner-hosted tank.daitan.site; existing service is preserved. No public API deployment is implied.
+
 ## 0.1.0 — 2026-11-12
 
 - Initial project from supplied DEEP COMMAND design.

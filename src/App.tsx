@@ -51,6 +51,7 @@ import {
 } from "./simulation";
 const CommandRoom = lazy(() => import("./CommandRoom"));
 import "./style.css";
+import AccountPanel from "./AccountPanel";
 const fmt = (n: number) =>
   `${Math.floor(n / 60)
     .toString()
@@ -545,7 +546,9 @@ export default function App() {
   } = useGame();
   const [view, setView] = useState("Command");
   const [selected, setSelected] = useState("C-01");
-  const [modal, setModal] = useState<"menu" | "settings" | "help" | null>(null);
+  const [modal, setModal] = useState<
+    "menu" | "settings" | "help" | "account" | null
+  >(null);
   const [toast, setToast] = useState("");
   const [room, setRoom] = useState(false);
   const file = useRef<HTMLInputElement>(null);
@@ -754,7 +757,7 @@ export default function App() {
               <br />
               SIMULATION
               <br />
-              <b>v0.1 / ALPHA</b>
+              <b>v0.2 / ALPHA</b>
             </div>
           </div>
         </aside>
@@ -1414,6 +1417,12 @@ export default function App() {
               >
                 Tiếp tục bản lưu
               </button>
+              <button
+                className="text-button"
+                onClick={() => setModal("account")}
+              >
+                Tài khoản / cloud
+              </button>
               <span>FICTIONAL WORLD · LOCAL ALPHA</span>
             </div>
           </section>
@@ -1507,7 +1516,9 @@ export default function App() {
                 ? "Bộ chỉ huy"
                 : modal === "settings"
                   ? "Cài đặt"
-                  : "Chỉ thị chỉ huy"}
+                  : modal === "account"
+                    ? "Tài khoản & cloud save"
+                    : "Chỉ thị chỉ huy"}
             </h2>
             {modal === "menu" ? (
               <div className="menu-options">
@@ -1526,6 +1537,29 @@ export default function App() {
                   }}
                 >
                   <RotateCcw size={18} /> Tiếp tục bản lưu
+                </button>
+                <button
+                  onClick={() => {
+                    if (g.mode === "running") dispatch({ type: "pause" });
+                    setModal("account");
+                  }}
+                >
+                  <Users size={18} />
+                  Tài khoản & cloud save
+                </button>
+                <button
+                  onClick={() => {
+                    try {
+                      useGame.getState().restoreBackup();
+                      setModal(null);
+                      notify("Đã khôi phục bản local trước khi nhập.");
+                    } catch (e) {
+                      notify((e as Error).message);
+                    }
+                  }}
+                >
+                  <RotateCcw size={18} />
+                  Khôi phục trước khi nhập
                 </button>
                 <button onClick={manualSave}>
                   <Save size={18} /> Lưu tiến trình
@@ -1552,6 +1586,8 @@ export default function App() {
                   <Upload size={18} /> Nhập tệp lưu
                 </button>
               </div>
+            ) : modal === "account" ? (
+              <AccountPanel />
             ) : modal === "settings" ? (
               <div className="settings">
                 <button onClick={() => dispatch({ type: "sound" })}>
@@ -1568,8 +1604,8 @@ export default function App() {
                   cuối cùng.
                 </p>
                 <p>
-                  Phiên bản alpha chạy local-first; tài khoản và lưu đám mây
-                  thuộc backend tùy chọn, chưa kết nối giao diện.
+                  Cloud save có trong Menu → Tài khoản & cloud save khi bạn cấu
+                  hình backend. Lưu tự động chỉ lưu trên trình duyệt.
                 </p>
               </div>
             ) : (

@@ -755,7 +755,13 @@ export function restore(raw: string): State {
     )
   )
     fail();
-  if (new Set(s.contacts.map((c: any) => c.id)).size !== 5) fail();
+  if (
+    new Set(s.contacts.map((c: any) => c.id)).size !== 5 ||
+    !initialContacts().every((c) =>
+      s.contacts.some((saved: any) => saved.id === c.id),
+    )
+  )
+    fail();
   if (
     !Array.isArray(s.crew) ||
     s.crew.length !== 6 ||
@@ -767,6 +773,16 @@ export function restore(raw: string): State {
         finite(c.skill, 0, 100) &&
         finite(c.fatigue, 0, 100) &&
         finite(c.morale, 0, 100),
+    )
+  )
+    fail();
+  const expectedCrew = createState().crew;
+  if (
+    !expectedCrew.every(
+      (c) =>
+        s.crew.filter(
+          (saved: any) => saved.id === c.id && saved.role === c.role,
+        ).length === 1,
     )
   )
     fail();

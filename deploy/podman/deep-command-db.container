@@ -1,0 +1,16 @@
+[Unit]
+Description=DEEP COMMAND PostgreSQL
+
+[Container]
+Image=docker.io/library/postgres:17-alpine
+ContainerName=deep-command-db
+Network=deep-command.network
+Volume=deep-command-pg.volume:/var/lib/postgresql/data
+EnvironmentFile=%h/.config/deep-command/database.env
+
+[Service]
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

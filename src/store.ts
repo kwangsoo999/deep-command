@@ -18,6 +18,7 @@ export const useGame = create<{
   load: () => void;
   fresh: () => void;
   importSave: (raw: string) => void;
+  restoreBackup: () => void;
 }>((set, get) => ({
   game: createState(),
   dispatch: (a) =>
@@ -48,8 +49,17 @@ export const useGame = create<{
   },
   importSave: (raw) => {
     const game = restore(raw);
+    localStorage.setItem(KEY + "-backup", serialize(get().game));
+    localStorage.setItem(KEY, serialize(game));
     clock.reset();
     set({ game });
+  },
+  restoreBackup: () => {
+    const raw = localStorage.getItem(KEY + "-backup");
+    if (!raw) throw Error("Chưa có bản dự phòng trước khi nhập.");
+    const game = restore(raw);
     localStorage.setItem(KEY, serialize(game));
+    clock.reset();
+    set({ game });
   },
 }));

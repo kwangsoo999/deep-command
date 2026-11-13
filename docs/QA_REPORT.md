@@ -1,39 +1,32 @@
-# QA report — 2026-11-12
+# QA report — 2026-11-13 / v0.2.0
 
-Target: DEEP COMMAND 0.1.0 local-first alpha. Tested on Node 24.22.1, Python 3.12.14, Linux. Evidence is command results, not assumptions from file existence.
+Tested on Node 24.22.1, Python 3.12.14, Linux. Evidence is command output, not file existence. Prior 0.1 CI completed successfully; v0.2 results below describe the current source.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
-| Frontend unit/DOM | PASS | `npm test`: 17/17 tests, 2 files |
-| Production build | PASS | `npm run build`: TypeScript + Vite, no build errors |
-| API tests | PASS | `.venv/bin/pytest -q backend/test_api.py`: 3/3, SQLite memory database |
-| Clock pause/plan/speeds | PASS | frozen full state; resume; 1/2/4 speed; frame partition comparison |
-| Seed/save continuation | PASS | deterministic events and restored future state; no duplicate events |
-| Full campaign | PASS (logic) | 5 missions completed using actions/ticks; rewards once, next unlock, final completion |
-| DOM interactions | PASS | briefing/start/stations; Space pause; scan/verify/waypoint controls; manual save/load |
-| Auth/privacy | PASS (tested scope) | register/login, duplicate user, invalid password, unauthorized access, cross-player save isolation, logout revocation |
-| Invalid import | PASS (tested scope) | malformed schema, invalid confidence and missing contacts rejected |
-| 3D, pointer/raycast, layouts | NOT VERIFIED | actual browser/WebGL QA not run |
-| FPS/memory/Chrome/Firefox/Edge | NOT VERIFIED | no performance or cross-browser evidence |
-| Docker/PostgreSQL | NOT VERIFIED | configuration only; API tests use SQLite |
-| GitHub access | VERIFIED | Owner created private repository kwangsoo999/deep-command; current integration reports pull/push permission. Remote upload is verified separately after push. |
+| Frontend simulation/client/DOM | PASS | `npm test`: 32 passed, one optional HTTP test skipped by default |
+| Real HTTP integration | PASS | `VITE_TEST_API_URL=http://127.0.0.1:8012 npm exec vitest -- run tests/cloud.integration.test.ts`: 1 passed against running FastAPI and disposable SQLite |
+| API tests | PASS | `.venv/bin/pytest -q backend/test_api.py`: 7 passed, SQLite memory DB |
+| Production build | PASS | TypeScript/Vite production build |
+| Full campaign/clock/save core | PASS | Original 5-mission action/tick run; pause/plan/speeds, deterministic seed, save continuation remain passing |
+| Account UI | PASS (DOM) | Registration/login, confirmation before upload/download, conflict lockout, backup recovery, briefing access without starting mission |
+| Cloud client | PASS | Bearer headers, memory-only session, expiry/logout handling, malformed downloaded state, no-backend behavior and conflict error; no automatic retry |
+| Revision/ownership/CORS | PASS | stale revision blocked, exact revision updates, per-player isolation, logout revocation, CORS preflight and pre-parse oversized-body rejection |
+| Import/storage failure | PASS | bad identity/schema rejected; failed backup/save does not replace active game |
+| Browser/WebGL/layout/FPS | NOT VERIFIED | no browser QA or benchmark evidence; DOM tests are not a rendering/performance test |
+| Docker/Podman/PostgreSQL | NOT VERIFIED | templates/configuration only; database tests use SQLite; Docker Compose config passes static validation |
+| Existing public site | READ-ONLY VERIFIED | tank.daitan.site root returns HTTP 200 and DEEP COMMAND title; /api/version returns 404 at inspection. No VPS rollout performed. |
 
-Build output after lazy loading: main JS ~282 KB (89 KB gzip), Three.js room chunk ~494 KB (127 KB gzip), CSS ~29 KB (8 KB gzip). These are bundle sizes, not network/FPS benchmarks. UI beep tested only by code/build, not audible playback. No browser preview server was started.
+Total executed checks: 32 frontend tests + 1 HTTP integration test + 7 API tests = 40 passed. Default npm test intentionally skips the HTTP test unless VITE_TEST_API_URL targets a disposable service. CI backend job now starts that service and runs the HTTP test explicitly.
 
-The managed Sites workflow requires `cua_repl.js`; no such callable tool was available. Its instruction is: “If cua_repl.js is unavailable, skip browser QA: do not start a preview server, install a browser, or improvise another browser-control path.” Source: `skill://plugin_connector_1p_689987207de08191979cf68eca2941c6/sites/SKILL.md`. DOM tests do not replace this visual/runtime check.
+Build: main JS ~292 KB (92 KB gzip), Three.js lazy chunk ~494 KB (127 KB gzip), CSS ~32 KB (8 KB gzip). These are bundle sizes, not FPS/network measurements. Backend ephemeral HTTP QA service uses a disposable SQLite file under work/, outside source. No production account, database or domain was modified by these tests.
 
-## Corrections during implementation
+The managed Sites skill requires `cua_repl.js`; it is not offered in this environment. Its exact instruction is: “If cua_repl.js is unavailable, skip browser QA: do not start a preview server, install a browser, or improvise another browser-control path.” Source: `skill://plugin_connector_1p_689987207de08191979cf68eca2941c6/sites/SKILL.md`. No browser preview server was started. FastAPI was started only for the HTTP integration test.
 
-- Split Three.js into a lazy-loaded room to avoid loading 3D for the tactical UI.
-- Added field/array validation to imported saves.
-- Prevented background interaction while overlays open; added dialog semantics and keyboard focus trapping.
-- Scoped UI test through accessible dialog content after discovering overlapping save control names; all final tests pass.
+## Scope limits
 
-## Remaining risks / scope limits
-
-- Alpha is not release-certified. Browser/WebGL QA must precede user-facing beta.
-- Original brief includes realistic art, full crew/rank branches, migration lifecycle and cloud persistence UI; these are still pending, detailed in PROJECT_STATUS.
-- Cloud API is optional and not connected to current local UI. API save payload checks are basic; public deployments need body caps, stronger deployment hardening and authoritative validation if adding competitive features.
-- Starlette TestClient reports one dependency deprecation warning about anyio.BlockingPortal; no test failure.
-
-No blanket “zero defects” claim is made. Initial GitHub repository creation was denied by integration permissions. The owner subsequently created the private repository and enabled access; pull/push permissions have now been verified. Repository creation was not an automatic approval-review rejection.
+- Cloud UI/API is implemented but the public site's API is not yet routed. See deploy/VPS_TANK.md for prepared Podman/Cloudflare steps; VPS SSH is not configured in this task environment.
+- PostgreSQL and Podman templates are not runtime verified. No DB schema change was made in v0.2; existing updated_at is used as revision.
+- Cloud API save validation is envelope/version/size validation; full game validation occurs on client import. Personal saves are not authoritative competitive state.
+- Realistic art, advanced crew/rank mechanics, broader balance and beta gates remain pending in PROJECT_STATUS.
+- Starlette TestClient emits one anyio.BlockingPortal dependency deprecation warning; no test failure.

@@ -1,0 +1,20 @@
+[Unit]
+Description=DEEP COMMAND optional account and save API
+Requires=deep-command-db.service
+After=deep-command-db.service
+StartLimitIntervalSec=300
+StartLimitBurst=30
+
+[Container]
+Image=localhost/deep-command-api:0.2.0
+ContainerName=deep-command-api
+Network=deep-command.network
+PublishPort=127.0.0.1:18089:8000
+EnvironmentFile=%h/.config/deep-command/backend.env
+
+[Service]
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

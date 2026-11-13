@@ -1,6 +1,6 @@
 # DEEP COMMAND — Silent Ocean
 
-Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.1.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
+Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.2.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
 
 Bạn chỉ huy **DCS Aurora** trong chiến dịch **Northern Horizon**: đọc tình báo, nhận dạng liên lạc, đặt hành trình, xử lý sự cố và bảo vệ thủy thủ đoàn. Thế giới, tọa độ GU, sonar và giao chiến đều là cơ chế game giả tưởng.
 
@@ -37,11 +37,17 @@ Menu có lưu/tải, xuất/nhập JSON và chiến dịch mới. Autosave mỗi
 - 6 sĩ quan, huấn luyện/nghỉ ngơi, 8 loại sự cố, 10 nâng cấp, tài nguyên và debrief.
 - Boong 3D Three.js dựng bằng code, kéo để nhìn, cuộn zoom, click 4 màn hình mở trạm. Nạp riêng khi chọn Boong 3D.
 - UI tiếng Việt, giao diện dữ liệu tối, hỗ trợ bàn phím và bố cục responsive.
-- FastAPI + SQLAlchemy cho auth/profile/save tùy chọn; cấu hình PostgreSQL và Docker; CI.
+- Đăng ký/đăng nhập, lưu/tải cloud qua FastAPI tùy chọn; kiểm soát xung đột bản lưu giữa các thiết bị.
+- Bản dự phòng local trước khi nhập JSON/tải cloud; khôi phục từ Menu.
+- Cấu hình PostgreSQL và Docker; CI có kiểm thử cloud save qua HTTP thật.
 
 ## Backend tùy chọn
 
-Giao diện alpha hiện dùng localStorage, **chưa gọi API tài khoản hoặc cloud save**. API hoạt động độc lập và có kiểm thử; không cần đăng nhập để chơi.
+Game luôn chơi được bằng localStorage; không cần đăng nhập. Để bật tài khoản/cloud save, sao chép `.env.example` thành `.env` và đặt `VITE_API_URL=http://localhost:8000`, rồi khởi động lại Vite/build lại. API cần chạy riêng bằng các lệnh bên dưới.
+
+Trong briefing chọn **Tài khoản / cloud**, hoặc mở **Menu → Tài khoản & cloud save**. Đăng ký/đăng nhập, kiểm tra bản cloud, rồi chọn lưu hoặc tải và xác nhận. Cloud không đồng bộ tự động. Khi thiết bị khác đã cập nhật bản lưu, server trả xung đột và yêu cầu kiểm tra lại; không âm thầm ghi đè.
+
+Token chỉ giữ trong bộ nhớ; reload trang cần đăng nhập lại. Autosave 15 giây vẫn chỉ lưu local. Tải cloud/import JSON tạo một bản dự phòng local; chọn **Menu → Khôi phục trước khi nhập** để lấy lại. Lưu offline cũ `deep-command-v1` vẫn dùng được. Chi tiết ở [CLOUD_SAVE](docs/CLOUD_SAVE.md).
 
 ```bash
 python -m venv .venv
@@ -65,6 +71,10 @@ npm run build
 ```
 
 Xem [QA_REPORT](docs/QA_REPORT.md) để biết phạm vi bằng chứng và giới hạn. Chưa xác minh trực quan WebGL, FPS và các trình duyệt; không tuyên bố đáp ứng 60 FPS hoặc beta release gate.
+
+## VPS đang sử dụng
+
+Chủ dự án đang phục vụ frontend tại [tank.daitan.site](https://tank.daitan.site) qua Podman/systemd và Cloudflare Tunnel. API `/api/version` trả 404 khi kiểm tra; bản cloud 0.2 cần cập nhật frontend và bổ sung backend/routing. Xem [hướng dẫn riêng cho VPS](deploy/VPS_TANK.md). Các file Quadlet là mẫu bổ sung, chưa được chạy trên VPS trong phiên này.
 
 ## Tiếp tục phát triển
 

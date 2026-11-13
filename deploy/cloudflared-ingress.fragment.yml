@@ -1,0 +1,9 @@
+# Fragment only. Merge with existing tunnel rules; retain tunnel identity,
+# credentials and every unrelated hostname. API rule must precede web rule.
+ingress:
+  - hostname: tank.daitan.site
+    path: ^/api/.*
+    service: http://127.0.0.1:18089
+  - hostname: tank.daitan.site
+    service: http://127.0.0.1:18088
+  # Preserve the existing final catch-all and unrelated ingress rules.

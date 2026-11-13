@@ -185,3 +185,14 @@ describe("Save validation", () => {
     expect(() => restore(JSON.stringify(d))).toThrow();
   });
 });
+
+describe("Cloud/import identity validation", () => {
+  it("rejects contacts and crew that cannot be used by the game interface", () => {
+    const contact = JSON.parse(serialize(createState()));
+    contact.state.contacts[0].id = "invalid-id";
+    expect(() => restore(JSON.stringify(contact))).toThrow();
+    const crew = JSON.parse(serialize(createState()));
+    crew.state.crew[2].role = "Unknown";
+    expect(() => restore(JSON.stringify(crew))).toThrow();
+  });
+});

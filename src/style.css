@@ -1951,3 +1951,143 @@ footer {
     animation: none !important;
   }
 }
+.account-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+.account-panel > svg {
+  color: var(--cyan);
+}
+.account-panel p {
+  font-size: 12px;
+}
+.account-panel code {
+  color: #8bd3cb;
+  overflow-wrap: anywhere;
+}
+.account-caption {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #81b9bd;
+  font: 9px monospace;
+  letter-spacing: 0.7px;
+}
+.account-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.account-panel label {
+  font-size: 11px;
+  color: #a4bfcc;
+}
+.account-panel input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #3a5c6c;
+  background: #081a25;
+  border-radius: 4px;
+  color: #d6e6ed;
+  outline: none;
+}
+.account-panel input:focus {
+  border-color: #7dc6d0;
+  box-shadow: 0 0 0 2px #7dc6d022;
+}
+.account-panel input:disabled {
+  opacity: 0.5;
+}
+.account-panel form > .primary {
+  margin-top: 8px;
+  padding: 13px;
+}
+.account-panel form > p {
+  font-size: 10px;
+  margin-top: 7px;
+  color: #6d8d9f;
+}
+.account-error {
+  color: #e2ac95 !important;
+  background: #552f2333;
+  border: 1px solid #835443;
+  padding: 12px;
+  border-radius: 4px;
+}
+.account-success {
+  color: #a8d6bc !important;
+  background: #204c3933;
+  border: 1px solid #3b7057;
+  padding: 12px;
+  border-radius: 4px;
+}
+.cloud-profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #2d4553;
+  padding-bottom: 17px;
+}
+.cloud-profile b {
+  color: #c1dbdf;
+  font-size: 16px;
+}
+.cloud-profile button {
+  font-size: 10px;
+}
+.cloud-summary {
+  background: #0c1e2b;
+  padding: 18px;
+  border: 1px solid #294453;
+  border-radius: 4px;
+}
+.cloud-summary h3 {
+  margin: 12px 0 5px;
+}
+.cloud-summary p {
+  margin-top: 10px;
+}
+.cloud-summary time {
+  display: block;
+  margin-top: 10px;
+  font: 10px monospace;
+  color: #7299ab;
+}
+.cloud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cloud-actions button {
+  font-size: 10px;
+  flex: 1;
+  padding: 10px;
+  white-space: nowrap;
+}
+.cloud-confirm {
+  padding: 17px;
+  border: 1px solid #897142;
+  background: #5b472822;
+  border-radius: 4px;
+}
+.cloud-confirm h3 {
+  color: #dec799;
+  font-size: 14px;
+}
+.cloud-confirm p {
+  margin: 12px 0;
+}
+.cloud-confirm > div {
+  display: flex;
+  gap: 9px;
+}
+.cloud-note {
+  font-size: 10px !important;
+  color: #7294a6 !important;
+}
+
+.briefing-bottom {
+  flex-wrap: wrap;
+  gap: 12px;
+}

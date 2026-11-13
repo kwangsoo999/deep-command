@@ -58,3 +58,13 @@ describe("Player interface integration", () => {
     expect(useGame.getState().game.mode).toBe("paused");
   });
 });
+
+it("opens cloud access from briefing without starting the mission", () => {
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Tài khoản / cloud" }));
+  expect(
+    screen.getByRole("heading", { name: "Tài khoản & cloud save" }),
+  ).toBeTruthy();
+  expect(useGame.getState().game.stage).toBe("briefing");
+  expect(useGame.getState().game.time).toBe(0);
+});
