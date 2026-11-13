@@ -1,4 +1,10 @@
 import * as T from "three";
+import {
+  createSurfaceMaps,
+  createReflectionMap,
+  addWaterLight,
+  createBubbleTexture,
+} from "./appearance";
 import type { State } from "../simulation";
 export const stationNames = [
   "Sonar",
@@ -14,6 +20,9 @@ export const cameraViews = {
   Engineering: { position: [1.2, 2.15, -1.7], target: [1.2, 1.9, -5.4] },
   Intelligence: { position: [3.6, 2.15, -1.7], target: [3.6, 1.9, -5.4] },
   ocean: { position: [17, 9, 21], target: [0, 0, 0] },
+  bow: { position: [9, 3, -13], target: [0, 0, -3] },
+  sail: { position: [6, 4, 2], target: [0, 1.6, -1] },
+  stern: { position: [7, 2, 16], target: [0, 0, 6] },
 } as const;
 export type CameraView = keyof typeof cameraViews;
 export interface Assembly {
@@ -42,6 +51,7 @@ export function disposeScene(scene: T.Scene) {
     textures = new Set<T.Texture>();
   scene.traverse((o) => {
     if (o instanceof T.Mesh || o instanceof T.Points) {
+      if (o instanceof T.InstancedMesh) o.dispose();
       geometries.add(o.geometry);
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
         materials.add(m);
@@ -50,6 +60,8 @@ export function disposeScene(scene: T.Scene) {
       }
     }
   });
+  if (scene.environment instanceof T.Texture) textures.add(scene.environment);
+  if (scene.background instanceof T.Texture) textures.add(scene.background);
   textures.forEach((t) => t.dispose());
   geometries.forEach((g) => g.dispose());
   materials.forEach((m) => m.dispose());
@@ -70,7 +82,10 @@ export function createAssembly(
 ): Assembly {
   const scene = new T.Scene(),
     targets: T.Mesh[] = [];
+  scene.environment = createReflectionMap(high);
+  scene.environmentIntensity = mode === "deck" ? 0.55 : 0.8;
   const steel = new T.MeshStandardMaterial({
+    ...createSurfaceMaps(high, "steel"),
     color: 0x34454b,
     metalness: 0.65,
     roughness: 0.56,
@@ -141,7 +156,9 @@ export function createAssembly(
   }[] = [];
   let ocean: T.ShaderMaterial | undefined,
     particles: T.Points | undefined,
-    propeller: T.Group | undefined;
+    propeller: T.Group | undefined,
+    wake: T.Points | undefined;
+  const waterClock = { value: 0 };
   const alertLights: T.PointLight[] = [];
   if (mode === "deck") {
     scene.background = new T.Color("#060e14");
@@ -317,10 +334,12 @@ export function createAssembly(
     sun.position.set(-12, 18, 5);
     scene.add(sun);
     const hull = new T.MeshStandardMaterial({
-      color: 0x243b46,
-      metalness: 0.6,
-      roughness: 0.44,
+      ...createSurfaceMaps(high, "acoustic"),
+      color: 0x607c86,
+      metalness: 0.18,
+      roughness: 0.88,
     });
+    addWaterLight(hull, waterClock);
     const main = mesh(
       new T.CapsuleGeometry(1.3, 14, 12, high ? 40 : 20),
       hull,
@@ -374,6 +393,77 @@ export function createAssembly(
       blade.rotation.z = (-i * Math.PI * 2) / 7 + 0.35;
       propeller.add(blade);
     }
+    // Stylized terrain establishes distance without using real geography.
+    const terrainGeometry = new T.PlaneGeometry(
+      160,
+      160,
+      high ? 64 : 24,
+      high ? 64 : 24,
+    );
+    const terrainPositions = terrainGeometry.attributes.position;
+    for (let i = 0; i < terrainPositions.count; i++)
+      terrainPositions.setZ(
+        i,
+        Math.sin(terrainPositions.getX(i) * 0.12) * 1.2 +
+          Math.cos(terrainPositions.getY(i) * 0.17) * 0.8,
+      );
+    terrainGeometry.computeVertexNormals();
+    const seabed = mesh(
+      terrainGeometry,
+      new T.MeshStandardMaterial({ color: 0x36494b, roughness: 1 }),
+      0,
+      -13,
+      0,
+    );
+    seabed.rotation.x = -Math.PI / 2;
+    seabed.name = "seabed";
+    const rocks = new T.InstancedMesh(
+      new T.IcosahedronGeometry(1, 0),
+      new T.MeshStandardMaterial({ color: 0x263b40, roughness: 0.95 }),
+      high ? 48 : 16,
+    );
+    const dummy = new T.Object3D();
+    for (let i = 0; i < rocks.count; i++) {
+      const x = Math.sin(i * 23.7) * 45,
+        z = Math.cos(i * 17.9) * 45;
+      dummy.position.set(x, -12.5, z);
+      dummy.scale.set(
+        1 + Math.abs(Math.sin(i)) * 2,
+        0.4 + Math.abs(Math.cos(i)),
+        1 + Math.abs(Math.sin(i * 2)),
+      );
+      dummy.rotation.set(i * 0.3, i, 0);
+      dummy.updateMatrix();
+      rocks.setMatrixAt(i, dummy.matrix);
+    }
+    rocks.name = "seabed-rocks";
+    scene.add(rocks);
+    const bubbles = createBubbleTexture();
+    const wakeGeometry = new T.BufferGeometry();
+    const wakePositions = new Float32Array((high ? 120 : 40) * 3);
+    for (let i = 0; i < wakePositions.length / 3; i++) {
+      const t = i / (wakePositions.length / 3);
+      wakePositions[i * 3] = Math.sin(i * 2.4) * t * 1.5;
+      wakePositions[i * 3 + 1] = Math.cos(i * 3.7) * t * 0.6;
+      wakePositions[i * 3 + 2] = t * 12;
+    }
+    wakeGeometry.setAttribute(
+      "position",
+      new T.BufferAttribute(wakePositions, 3),
+    );
+    wake = new T.Points(
+      wakeGeometry,
+      new T.PointsMaterial({
+        map: bubbles,
+        size: 0.3,
+        transparent: true,
+        opacity: 0.3,
+        depthWrite: false,
+      }),
+    );
+    wake.position.z = 9;
+    wake.name = "propeller-wake";
+    scene.add(wake);
     ocean = new T.ShaderMaterial({
       side: T.DoubleSide,
       transparent: true,
@@ -399,6 +489,7 @@ export function createAssembly(
     particles = new T.Points(
       geo,
       new T.PointsMaterial({
+        map: bubbles,
         color: 0x86ced7,
         size: 0.055,
         transparent: true,
@@ -439,6 +530,12 @@ export function createAssembly(
       }
       for (const light of alertLights)
         light.intensity = g.incident ? 12 + Math.sin(time * 4) * 4 : 0;
+      waterClock.value = time;
+      if (wake) {
+        wake.visible = Boolean(g.waypoint);
+        wake.position.z = 9 + ((time * 0.3) % 1.5);
+        wake.rotation.z = Math.sin(time * 0.2) * 0.08;
+      }
       if (ocean) ocean.uniforms.uTime.value = time;
       if (particles) particles.position.z = (time * 0.12) % 10;
       if (propeller) propeller.rotation.z = g.waypoint ? time * 1.2 : 0;

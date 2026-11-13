@@ -29,6 +29,10 @@ export default function CommandRoom({
     [view, setView] = useState<CameraView>("bridge"),
     [error, setError] = useState(""),
     [retry, setRetry] = useState(0);
+  const [exposure, setExposure] = useState(1.25),
+    [clean, setClean] = useState(false);
+  const exposureRef = useRef(exposure);
+  exposureRef.current = exposure;
   const viewRef = useRef<CameraView>(view);
   viewRef.current = view;
   const quality = game.settings.quality;
@@ -73,7 +77,7 @@ export default function CommandRoom({
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.enablePan = false;
-    controls.minDistance = mode === "ocean" ? 8 : 1.4;
+    controls.minDistance = mode === "ocean" ? 4 : 1.4;
     controls.maxDistance = mode === "ocean" ? 48 : 12;
     controls.minPolarAngle = 0.3;
     controls.maxPolarAngle = mode === "ocean" ? Math.PI * 0.83 : Math.PI * 0.65;
@@ -167,8 +171,12 @@ export default function CommandRoom({
         camera.position.x = T.MathUtils.clamp(camera.position.x, -maxX, maxX);
         camera.position.z = T.MathUtils.clamp(camera.position.z, -3.2, 7);
         camera.lookAt(controls.target);
+      } else {
+        camera.position.y = T.MathUtils.clamp(camera.position.y, -9, 9.5);
+        camera.lookAt(controls.target);
       }
       assembly.update(g, visualTime);
+      renderer.toneMappingExposure = exposureRef.current;
       renderer.render(assembly.scene, camera);
       frame = requestAnimationFrame(draw);
     };
@@ -220,7 +228,25 @@ export default function CommandRoom({
           <RotateCcw size={14} />
         </button>
       </div>
-      <div className="scene-viewport">
+      <div className="scene-look-controls">
+        <label htmlFor="scene-exposure">
+          Độ sáng{" "}
+          <input
+            id="scene-exposure"
+            type="range"
+            min="0.7"
+            max="1.8"
+            step="0.05"
+            value={exposure}
+            onChange={(e) => setExposure(Number(e.target.value))}
+          />
+          <output>{exposure.toFixed(2)}</output>
+        </label>
+        <button aria-pressed={clean} onClick={() => setClean((v) => !v)}>
+          {clean ? "Hiện HUD" : "Ẩn HUD"}
+        </button>
+      </div>
+      <div className={clean ? "scene-viewport clean-view" : "scene-viewport"}>
         <div className="scene-canvas" ref={host} />
         <div className="scene-grain" />
         <div className="scene-topline">
@@ -274,21 +300,28 @@ export default function CommandRoom({
       <div className="camera-presets">
         <Camera size={15} />
         <span>GÓC NHÌN</span>
-        {(mode === "deck" ? ["bridge", ...stationNames] : ["ocean"]).map(
-          (id) => (
-            <button
-              key={id}
-              className={view === id ? "active" : ""}
-              onClick={() => setView(id as CameraView)}
-            >
-              {id === "bridge"
-                ? "Toàn boong"
-                : id === "ocean"
-                  ? "Toàn cảnh"
-                  : id}
-            </button>
-          ),
-        )}
+        {(mode === "deck"
+          ? ["bridge", ...stationNames]
+          : ["ocean", "bow", "sail", "stern"]
+        ).map((id) => (
+          <button
+            key={id}
+            className={view === id ? "active" : ""}
+            onClick={() => setView(id as CameraView)}
+          >
+            {id === "bridge"
+              ? "Toàn boong"
+              : id === "ocean"
+                ? "Toàn cảnh"
+                : id === "bow"
+                  ? "Mũi tàu"
+                  : id === "sail"
+                    ? "Tháp chỉ huy"
+                    : id === "stern"
+                      ? "Đuôi tàu"
+                      : id}
+          </button>
+        ))}
       </div>
       <div className="deck-actions">
         <button

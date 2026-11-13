@@ -1,6 +1,6 @@
 # DEEP COMMAND — Silent Ocean
 
-Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.3.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
+Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.4.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
 
 Bạn chỉ huy **DCS Aurora** trong chiến dịch **Northern Horizon**: đọc tình báo, nhận dạng liên lạc, đặt hành trình, xử lý sự cố và bảo vệ thủy thủ đoàn. Thế giới, tọa độ GU, sonar và giao chiến đều là cơ chế game giả tưởng.
 
@@ -44,9 +44,11 @@ Menu có lưu/tải, xuất/nhập JSON và chiến dịch mới. Autosave mỗi
 - Bản dự phòng local trước khi nhập JSON/tải cloud; khôi phục từ Menu.
 - Cấu hình PostgreSQL và Docker; CI có kiểm thử cloud save qua HTTP thật.
 
-## Đồ họa 0.3
+## Đồ họa 0.4
 
 Chọn **Boong / Biển** trên thanh trạm. Dùng nút **Boong chỉ huy / Đại dương** để đổi cảnh, chọn góc nhìn camera hoặc kéo/zoom. Trong boong, chọn màn hình hoặc nút trạm để mở chức năng. Nút quét sonar/đặt tuyến tác động cùng simulation như bản đồ. Pause/Plan dừng hiệu ứng theo thời gian; camera vẫn quan sát được.
+
+Bản 0.4 bổ sung các lớp màu/normal/roughness sinh từ code cho kim loại và tấm phủ thân tàu, môi trường phản chiếu, vệt sáng nước, địa hình đáy biển/đá dựng theo cụm và dòng nước sau chân vịt khi có hành trình. Camera ngoại cảnh có thêm Mũi tàu, Tháp chỉ huy, Đuôi tàu. Thanh Độ sáng và nút Ẩn HUD chỉ thay cách quan sát, không đổi tiến trình.
 
 Chất lượng thấp tắt bóng đổ, giảm mật độ hạt và chia lưới mặt biển. Đồ họa vẫn procedural, chưa có asset GLB/PBR cuối cùng; browser/WebGL/FPS chưa được xác minh thực tế. Xem [VISUALS](docs/VISUALS.md).
 

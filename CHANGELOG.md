@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-11-13
+
+- Added original procedural albedo, normal and roughness maps for brushed steel/acoustic hull and generated reflection environment.
+- Added shader water-light pattern on hull, seabed terrain, instanced rocks, soft particle textures and navigation-driven propeller wake.
+- Added bow/sail/stern camera presets, exterior height bounds, exposure adjustment and clean HUD viewing.
+- Added texture/color-space/normal/disposal/shader-anchor tests and viewer controls tests; no save or API contract change.
+- All graphics remain procedural and actual rendered appearance/FPS has not been verified in this environment.
+
 ## 0.3.0 — 2026-11-13
 
 - Rebuilt procedural command deck with curved hull/ribs, detailed consoles, plotting table, fixtures, chairs and mixed warm/cool lighting.

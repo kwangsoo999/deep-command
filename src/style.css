@@ -2340,3 +2340,54 @@ footer {
     padding: 18px;
   }
 }
+
+.scene-look-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #28414e;
+  background: #0b1d28;
+}
+.scene-look-controls label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  color: #8eb3bf;
+}
+.scene-look-controls input {
+  width: 125px;
+  accent-color: #76c8c4;
+}
+.scene-look-controls output {
+  font: 10px monospace;
+  min-width: 30px;
+}
+.scene-look-controls button {
+  font-size: 9px;
+  padding: 6px 10px;
+}
+.clean-view .scene-topline,
+.clean-view .scene-title,
+.clean-view .scene-stats {
+  display: none;
+}
+.clean-view .scene-grain {
+  background: none;
+  box-shadow: none;
+}
+@media (max-width: 600px) {
+  .scene-look-controls {
+    gap: 7px;
+    padding: 9px 10px;
+  }
+  .scene-look-controls label {
+    gap: 7px;
+    font-size: 9px;
+  }
+  .scene-look-controls input {
+    width: 90px;
+  }
+}

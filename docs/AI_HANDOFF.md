@@ -25,7 +25,7 @@ Preserve working core and save schema; add migrations before changing saved stat
 
 ## Current limits
 
-See PROJECT_STATUS and QA_REPORT. Most significant: no actual browser/WebGL/FPS verification, existing tank.daitan.site frontend (v0.2 public API not yet configured), no real PostgreSQL/Docker runtime evidence, no migration pipeline or final art. Rank unlocks/advanced crew/branching/intel conflict are absent. No claim of full beta.
+See PROJECT_STATUS and QA_REPORT. Most significant: no actual browser/WebGL/FPS verification, existing tank.daitan.site frontend/API last read-only verified at v0.3.0, no real PostgreSQL/Docker runtime evidence, no migration pipeline or final art. Rank unlocks/advanced crew/branching/intel conflict are absent. No claim of full beta.
 
 ## How to continue
 
@@ -39,8 +39,13 @@ Read CLOUD_SAVE.md before altering persistence. Save schema stays v1. Existing D
 
 ## Owner's VPS
 
-Owner reports existing Podman/Quadlet service deep-command.service, local web origin 127.0.0.1:18088, Cloudflare Tunnel. Read deploy/VPS_TANK.md. Screenshot deployment files are not in remote main; preserve VPS-local configuration. Public root was read-only verified, API version returned 404. No configured SSH/VPS write access exists in this task environment. Prepared backend origin is 127.0.0.1:18089 with same-host /api/ tunnel routing; this is a proposal, not an executed rollout.
+Owner reports existing Podman/Quadlet service deep-command.service, local web origin 127.0.0.1:18088, Cloudflare Tunnel. Read deploy/VPS_TANK.md. Screenshot deployment files are not in remote main; preserve VPS-local configuration. Public root/assets/API were read-only verified at v0.3.0 after owner rollout; protected profile/save returned 401 without login. No configured SSH/VPS write access exists in this task environment. Prepared backend origin is 127.0.0.1:18089 with same-host /api/ tunnel routing; this is a proposal, not an executed rollout.
 
 ## v0.3 graphics
 
 Graphics consumes State read-only through a ref, so 1-second UI updates do not rebuild WebGL. Presentation time freezes under pause/planning; camera stays interactive. Five camera presets in deck and one exterior preset. Preserve disposeScene deduplication and dispose controls/observer/RAF/listeners on switching scene/quality. No new save fields. WebGL context loss exposes reload UI. Assembly and DOM-fallback tests do not prove rendered output or FPS.
+
+
+## v0.4 graphics
+
+`graphics/appearance.ts` owns deterministic generated DataTextures (albedo/normal/roughness, equirectangular reflection and bubble alpha) and onBeforeCompile water light. Color maps/reflection are sRGB; normal/roughness are non-color. Keep texture/shadow/InstancedMesh disposal intact. Caustic shader is tested against Three's standard shader anchors, not compiled by a real GPU in current QA. Additional exterior camera presets and exposure/HUD controls are presentation-only and do not change save schema. Terrain is artistic, not geographic data. See VISUALS.md.

@@ -60,3 +60,33 @@ describe("3D station controls with WebGL unavailable", () => {
     expect(JSON.stringify(g)).toBe(before);
   });
 });
+
+it("offers close-up exterior cameras and presentation-only exposure/HUD controls", () => {
+  const game = createState(),
+    before = JSON.stringify(game);
+  render(
+    <CommandRoom
+      game={game}
+      onStation={vi.fn()}
+      onScan={vi.fn()}
+      onWaypoint={vi.fn()}
+    />,
+  );
+  fireEvent.change(screen.getByLabelText("Độ sáng"), {
+    target: { value: "1.5" },
+  });
+  expect(screen.getByText("1.50")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Ẩn HUD" }));
+  expect(
+    screen
+      .getByRole("button", { name: "Hiện HUD" })
+      .getAttribute("aria-pressed"),
+  ).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "Đại dương" }));
+  fireEvent.click(screen.getByRole("button", { name: "Mũi tàu" }));
+  expect(screen.getByRole("button", { name: "Mũi tàu" }).className).toContain(
+    "active",
+  );
+  expect(screen.getByRole("button", { name: "Đuôi tàu" })).toBeTruthy();
+  expect(JSON.stringify(game)).toBe(before);
+});

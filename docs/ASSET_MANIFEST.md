@@ -21,3 +21,7 @@ Three.js and its code are MIT; React/Zustand/Vite and other packages retain thei
 - Added Aurora exterior geometry, original ocean shader, deterministic particle field and translucent light-shaft geometry.
 - Three.js OrbitControls from the same MIT dependency provides camera interaction.
 - All are procedural development assets, not final realistic GLB/PBR assets. See VISUALS.md for exact scope and unverified render quality.
+
+## v0.4 generated assets
+
+`src/graphics/appearance.ts` generates surface albedo/normal/roughness maps, LDR reflection map and soft particle alpha in memory. No third-party textures are downloaded. Seabed geometry and instanced rocks are created in scenes.ts. These are original procedural development assets, not scanned material packs or final GLB art.

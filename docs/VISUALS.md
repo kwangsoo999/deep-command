@@ -1,4 +1,4 @@
-# Graphics v0.3 — implementation reference
+# Graphics v0.4 — implementation reference
 
 ## What changed
 
@@ -20,8 +20,21 @@ Exterior: original capsule-based Aurora hull with seam rings, sail, masts, fins 
 
 ## Art limits and verification
 
-Models/materials are still procedural. There are no GLB assets, scanned PBR texture sets, animated crew, HDR environment maps, authored cinematics or final sound assets. Shader light shafts are stylized translucent geometry, not volumetric simulation.
+Models/materials are still procedural. There are no GLB assets or scanned PBR texture sets, animated crew, HDR environment maps, authored cinematics or final sound assets. Shader light shafts are stylized translucent geometry, not volumetric simulation.
 
 Automated assembly tests verify station raycasts from presets, live display refresh, exterior construction, lower particle count, visual time semantics and deduplicated disposal. DOM tests deliberately simulate unavailable WebGL and verify accessible actions/error state. None of these renders pixels.
 
 Real browser screenshots, visual review of material/light balance, control feel, clipping, shader compatibility, context recovery and FPS/memory profiling remain required. The managed environment has no callable cua_repl.js; the Sites workflow prohibits installing/improvising another browser QA path in that case. No screenshot or FPS result is claimed.
+
+
+## v0.4 surface and atmosphere pass
+
+Original generated RGBA DataTextures provide albedo, tangent-space normals and roughness for steel and acoustic tiles (256² high, 128² low). Color maps are sRGB; normal/roughness maps remain non-color. A generated LDR equirectangular map gives environmental reflection; it is not an HDR photograph or scanned asset. Three.js performs its usual environment processing at render time.
+
+Hull material augments the standard emissive shader chunk with artistic water-light patterns in world space. Shader uniforms use the existing paused presentation time. Tests verify anchor replacement against the installed Three ShaderLib, but do not establish GPU shader compilation or rendered appearance.
+
+Seabed is a deformed plane and an InstancedMesh rock group (48 high/16 low). Particle alpha is a generated soft texture; wake appears only while a waypoint is active. Terrain, effects and submarine shape are fictional decoration. Ocean camera height is bounded above the seabed/below the surface.
+
+Exterior presets now include bow/sail/stern. Exposure range 0.7–1.8 and Hide HUD let players inspect details without changing saved game settings or progression. Low quality reduces generated texture resolution and scene budgets. Shared textures, reflection maps and instance resources are explicitly disposed on scene changes. No new save/database fields.
+
+Four added appearance tests check deterministic texture data, color-space handling, encoded normals, quality dimensions, bubble alpha, shader injection anchors and lifecycle of terrain/wake/environment resources. Viewer DOM tests cover close-up buttons/exposure/HUD state without WebGL. Real lighting/material review, screenshots and FPS remain unverified.

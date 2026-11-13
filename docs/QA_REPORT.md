@@ -1,10 +1,10 @@
-# QA report — 2026-11-13 / v0.3.0
+# QA report — 2026-11-13 / v0.4.0
 
 Tested on Node 24.22.1, Python 3.12.14, Linux. Evidence is command output, not file existence. Prior 0.1 CI completed successfully; v0.2 results below describe the current source.
 
 | Check | Result | Evidence / scope |
 | --- | --- | --- |
-| Frontend simulation/client/DOM | PASS | `npm test`: 39 passed, one optional HTTP test skipped by default |
+| Frontend simulation/client/DOM | PASS | `npm test`: 44 passed, one optional HTTP test skipped by default |
 | Real HTTP integration | PASS | `VITE_TEST_API_URL=http://127.0.0.1:8012 npm exec vitest -- run tests/cloud.integration.test.ts`: 1 passed against running FastAPI and disposable SQLite |
 | API tests | PASS | `.venv/bin/pytest -q backend/test_api.py`: 7 passed, SQLite memory DB |
 | Production build | PASS | TypeScript/Vite production build |
@@ -17,9 +17,9 @@ Tested on Node 24.22.1, Python 3.12.14, Linux. Evidence is command output, not f
 | Docker/Podman/PostgreSQL | NOT VERIFIED | templates/configuration only; database tests use SQLite; Docker Compose config passes static validation |
 | Existing public site | READ-ONLY VERIFIED | tank.daitan.site root returns HTTP 200 and DEEP COMMAND title; /api/version returns 404 at inspection. No VPS rollout performed. |
 
-Total executed checks: 39 frontend tests + 1 HTTP integration test + 7 API tests = 47 checks in the CI suite. Default npm test intentionally skips the HTTP test unless VITE_TEST_API_URL targets a disposable service. CI backend job now starts that service and runs the HTTP test explicitly.
+Total executed checks: 44 frontend tests + 1 HTTP integration test + 7 API tests = 52 checks in the CI suite. Default npm test intentionally skips the HTTP test unless VITE_TEST_API_URL targets a disposable service. CI backend job now starts that service and runs the HTTP test explicitly.
 
-Build: main JS ~292 KB (92 KB gzip), Three.js/viewer lazy chunk ~536 KB (138 KB gzip), CSS ~37 KB (9 KB gzip). These are bundle sizes, not FPS/network measurements. Backend ephemeral HTTP QA service uses a disposable SQLite file under work/, outside source. No production account, database or domain was modified by these tests.
+Build: main JS ~292 KB (92 KB gzip), Three.js/viewer lazy chunk ~546 KB (142 KB gzip), CSS ~38 KB (9 KB gzip). These are bundle sizes, not FPS/network measurements. Backend ephemeral HTTP QA service uses a disposable SQLite file under work/, outside source. No production account, database or domain was modified by these tests.
 
 The managed Sites skill requires `cua_repl.js`; it is not offered in this environment. Its exact instruction is: “If cua_repl.js is unavailable, skip browser QA: do not start a preview server, install a browser, or improvise another browser-control path.” Source: `skill://plugin_connector_1p_689987207de08191979cf68eca2941c6/sites/SKILL.md`. No browser preview server was started. FastAPI was started only for the HTTP integration test.
 
@@ -35,3 +35,8 @@ The managed Sites skill requires `cua_repl.js`; it is not offered in this enviro
 ## v0.3 graphics checks
 
 Five scene/geometry tests verify console picking from presets, live data texture refresh without clock ticks, exterior scene state isolation, particle budget, shared-resource disposal and visual pause/restore behavior (some tests group related assertions). Two additional DOM tests simulate unavailable WebGL and check station/scan/waypoint actions and scene-mode switching. These tests do not create a real renderer or verify visual quality. Production build emits a >500KB lazy-chunk advisory for the graphics module; it is only requested when opening the 3D viewer and does not add this chunk to initial tactical UI loading. No render screenshot/FPS/memory evidence exists.
+
+
+## v0.4 appearance checks
+
+Four additional tests validate deterministic material map bytes, correct data/color spaces, near-unit encoded normals, low/high budgets, particle alpha, water-light injection using the installed standard shader chunks, terrain/wake behavior and disposal of environment/instance resources. A further DOM test verifies exterior camera controls and presentation-only exposure/HUD adjustments. These remain CPU/DOM tests; no GPU shader compilation or pixel/FPS claim is made. No production deployment was performed.

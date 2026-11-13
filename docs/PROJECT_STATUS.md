@@ -1,4 +1,4 @@
-# Status and roadmap — 0.3.0 alpha
+# Status and roadmap — 0.4.0 alpha
 
 This is a new implementation based on the supplied design. No previously accepted phase was available. Status refers to code and checks in this repository, not every item in the long-term brief.
 
@@ -33,3 +33,7 @@ Owner-hosted frontend tank.daitan.site is reachable (read-only HTTP/title check)
 ## v0.3 graphics delivery
 
 Implemented a new deck/ocean viewer with read-only simulation data, direct station commands, camera views and context recovery. Added assembly/raycast/resource/pause and fallback tests. Still not verified with a real WebGL renderer/browser and no FPS claims. See VISUALS.md.
+
+## v0.4 graphics delivery
+
+Generated surface maps/reflection environment, hull water-light shader, seabed/instanced rock dressing, wake particles, close-up cameras and exposure/HUD controls are implemented and unit/DOM-tested. No new external assets or gameplay changes. Pixel rendering, shader GPU compilation and performance still need actual browser QA.
