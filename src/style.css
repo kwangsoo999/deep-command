@@ -2429,3 +2429,207 @@ footer {
     display: none;
   }
 }
+.campaign-dialog {
+  width: 850px;
+}
+.campaign-hq {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.career-heading {
+  display: flex;
+  gap: 17px;
+  align-items: center;
+  color: #9acfc5;
+}
+.career-heading h3 {
+  font-size: 24px;
+  margin: 8px 0;
+}
+.career-heading p {
+  font-size: 11px;
+}
+.rank-track {
+  height: 5px;
+}
+.rank-track i {
+  color: #73c4b5;
+}
+.hq-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid #31505c;
+  border-radius: 4px;
+  background: #0a1e2b;
+}
+.hq-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 17px;
+  border-right: 1px solid #31505c;
+}
+.hq-stats b {
+  font: 24px monospace;
+  color: #c0ded8;
+}
+.hq-stats span {
+  font: 8px monospace;
+  letter-spacing: 1px;
+  color: #7093a3;
+}
+.hq-note {
+  font-size: 11px;
+  margin-top: -8px;
+}
+.mission-roster,
+.research-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.mission-roster article,
+.research-list article {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #2a4655;
+  border-radius: 4px;
+  background: #0d202d;
+}
+.mission-number {
+  font: 20px monospace;
+  color: #50808f;
+}
+.mission-roster article > div,
+.research-list article > div {
+  flex: 1;
+  min-width: 0;
+}
+.mission-roster h3,
+.research-list h3 {
+  font-size: 14px;
+}
+.mission-roster p,
+.research-list p {
+  font-size: 10px;
+  margin-top: 5px;
+}
+.mission-roster small {
+  display: block;
+  color: #85b8a4;
+  font: 9px monospace;
+  margin-top: 8px;
+}
+.mission-roster button,
+.research-list button {
+  font-size: 10px;
+  min-width: 92px;
+}
+.hq-services {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hq-services button {
+  font-size: 10px;
+}
+.campaign-complete {
+  padding: 20px;
+  border: 1px solid #477467;
+  background: #173a3333;
+  border-radius: 4px;
+  color: #a4d2bf;
+}
+.campaign-complete h3 {
+  margin: 10px 0;
+}
+.campaign-complete p {
+  font-size: 12px;
+}
+.briefing-rank {
+  margin-top: 15px;
+  font: 10px monospace;
+  color: #94c0b7;
+}
+.debrief-hq {
+  margin-bottom: 18px !important;
+  font-size: 11px;
+}
+.incident-choices {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+.incident-choices button {
+  font-size: 10px;
+}
+.incident-hint {
+  font-size: 10px !important;
+  margin-top: 13px !important;
+  color: #b1a38c !important;
+}
+@media (max-width: 600px) {
+  .hq-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hq-stats > div {
+    padding: 13px;
+  }
+  .hq-stats b {
+    font-size: 20px;
+  }
+  .career-heading h3 {
+    font-size: 21px;
+  }
+  .mission-roster article,
+  .research-list article {
+    padding: 13px;
+    gap: 10px;
+  }
+  .mission-roster h3,
+  .research-list h3 {
+    font-size: 12px;
+  }
+  .mission-number {
+    font-size: 15px;
+  }
+  .mission-roster button,
+  .research-list button {
+    min-width: 67px;
+    padding: 8px 6px;
+    font-size: 9px;
+  }
+  .mission-roster small {
+    font-size: 8px;
+  }
+  .hq-services button {
+    flex: 1;
+    font-size: 9px;
+  }
+  .campaign-hq .cloud-confirm > div {
+    flex-wrap: wrap;
+  }
+}
+.prep-return {
+  font-size: 10px;
+  padding: 9px 11px;
+}
+@media (max-width: 600px) {
+  .prep-return {
+    font-size: 8px;
+    padding: 7px;
+  }
+  .clock-status:has(.prep-return) {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 145px;
+    justify-content: flex-end;
+  }
+  .clock-status:has(.prep-return) .time {
+    display: none;
+  }
+}

@@ -30,6 +30,20 @@ it.skipIf(!base)(
     });
     const latest = await b.read();
     expect(latest?.state.mission).toBe(1);
+    const writes = await Promise.allSettled([
+      a.write(second, latest!.revision),
+      b.write(first, latest!.revision),
+    ]);
+    expect(writes.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    const rejected = writes.find(
+      (r) => r.status === "rejected",
+    ) as PromiseRejectedResult;
+    expect(rejected.reason).toMatchObject({ status: 409 });
+    const other = new CloudClient(base!);
+    await other.register(username + "_other", "integration-password-strong");
+    await other.login(username + "_other", "integration-password-strong");
+    expect(await other.read()).toBeNull();
+    await other.logout();
     await b.logout();
     expect(b.profile).toBeNull();
     await expect(b.read()).rejects.toMatchObject({ status: 401 });

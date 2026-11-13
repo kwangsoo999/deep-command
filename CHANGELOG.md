@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0 — 2026-11-13 / campaign completion pass
+
+- Added campaign HQ with mission unlock/replay, preflight fleet/crew access, ranks, personal best records, resupply and research.
+- Added timed crew response and emergency stabilization incident options; timers pause/restore correctly.
+- Prevented replay reward duplication and saved mission results immediately; checkpoint before mission changes.
+- Added backward-compatible v1 career defaults and stricter history/job validation. Older saves retain existing XP/completions; missing old best scores are not fabricated.
+- Added real PostgreSQL/concurrent-save HTTP checks, CI PostgreSQL service, Docker web/API runtime smoke QA and optional build CA mount support.
+- Split lazy graphics resources into viewer/effects/engine chunks for caching; main UI remains separate.
+- Added playthrough/readiness documentation with explicit remaining beta gates. No production deployment or browser/FPS claim.
+
 ## 0.5.0 — 2026-11-13
 
 - Replaced capsule hull/box sail/rectangular propeller blades with curved lathed hull and beveled authored sail/blade silhouettes.

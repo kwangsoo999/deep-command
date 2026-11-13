@@ -34,3 +34,12 @@ CloudClient giữ token và profile trong bộ nhớ, tự xóa phiên khi HTTP 
 GET save trả envelope v1 + `revision` (UTC timestamp chuẩn hóa). PUT nhận `expected_revision`; cập nhật theo compare-and-swap nguyên tử với giá trị `updated_at` cũ. Race tạo bản lưu đầu tiên bắt IntegrityError; conflict trả 409. Không thay DB schema, không đổi offline save schema. Client cũ không gửi revision sẽ bị chặn khi ghi đè save có sẵn: cần nâng frontend cùng API.
 
 Trước khi tải cloud/import, frontend validate save rồi ghi backup, ghi save mới, cuối cùng mới thay Zustand state. Lỗi storage giữ nguyên game đang chơi. Backup một slot theo origin, không phải version history toàn bộ. Xem CLOUD_SAVE.md.
+
+
+## Campaign build 0.9
+
+State has additive Career data: attempt count, best result per mission, purchased research IDs. Legacy v1 restores receive empty Career defaults; existing XP/completions/resources remain. Incident.response optionally stores crew repair remaining ticks. All rank/unlock calculations and resource/job decisions remain in career.ts/simulation.ts, not React.
+
+CampaignPanel opens preflight station access without starting simulation. Main UI's preparation flag is ephemeral; only explicit Start advances the briefing. Selecting an unlocked mission confirms and persists a checkpoint before dispatch. Store resets clock fractions on mode/deployment changes and immediately saves the first debrief transition. Failed disk writes retain the completed game in memory and expose saveError.
+
+Graphics source is split into lazy viewer/effects/engine chunks. HTTP deployment smoke tests fetch every chunk; a main-page 200 alone is not a complete asset check. Real GPU/browser verification remains absent.

@@ -159,6 +159,8 @@ describe("Gameplay loop", () => {
       }
     }
     expect(s.completed).toEqual([0, 1, 2, 3, 4]);
+    expect(s.career.best.map((r) => r.mission).sort()).toEqual([0, 1, 2, 3, 4]);
+    expect(s.career.attempts).toBe(5);
     expect(s.xp).toBeGreaterThan(0);
   });
   it("fails on resource exhaustion without reward and supports retry", () => {
@@ -170,7 +172,7 @@ describe("Gameplay loop", () => {
     expect(s.result?.reward).toBe(0);
     act(s, { type: "retry" });
     expect(s.stage).toBe("briefing");
-    expect(s.power).toBe(100);
+    expect(s.power).toBe(60);
   });
 });
 describe("Save validation", () => {
@@ -195,4 +197,12 @@ describe("Cloud/import identity validation", () => {
     crew.state.crew[2].role = "Unknown";
     expect(() => restore(JSON.stringify(crew))).toThrow();
   });
+});
+
+it("accumulates decimal frame steps without losing a whole game tick", () => {
+  const s = createState();
+  act(s, { type: "start" });
+  const clock = new SimulationClock();
+  for (let i = 0; i < 100; i++) clock.advance(s, 0.1);
+  expect(s.time).toBe(10);
 });

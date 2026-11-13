@@ -1,7 +1,7 @@
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN --mount=type=secret,id=proxy_ca if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; npm ci
 COPY index.html tsconfig.json vite.config.ts ./
 COPY src ./src
 ARG VITE_API_URL=

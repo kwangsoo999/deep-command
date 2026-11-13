@@ -1,6 +1,6 @@
 # DEEP COMMAND — Silent Ocean
 
-Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.5.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
+Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.9.0 — campaign build**, chưa phải beta hoàn chỉnh trong roadmap gốc.
 
 Bạn chỉ huy **DCS Aurora** trong chiến dịch **Northern Horizon**: đọc tình báo, nhận dạng liên lạc, đặt hành trình, xử lý sự cố và bảo vệ thủy thủ đoàn. Thế giới, tọa độ GU, sonar và giao chiến đều là cơ chế game giả tưởng.
 
@@ -14,6 +14,12 @@ npm run dev
 ```
 
 Mở địa chỉ Vite in trong terminal, thường là `http://localhost:5173`. Không cần backend để chơi. Build production: `npm run build`; thư mục `dist/` dùng được trên static hosting, kể cả hosting dưới subpath.
+
+## Bản chiến dịch 0.9
+
+Luồng chơi đã nối từ briefing/chuẩn bị → 5 nhiệm vụ → debrief/thưởng → hồ sơ cuối chiến dịch → chơi lại. Bộ chỉ huy có chọn mission đã mở, cấp bậc, điểm tốt nhất, tiếp tế và nghiên cứu. Sự cố có ba phương án, gồm công việc kỹ thuật theo thời gian. Lưu kết quả local ngay khi nhiệm vụ kết thúc.
+
+Xem [hướng dẫn chơi trọn chiến dịch](docs/USER_GUIDE.md) và [phạm vi nghiệm thu](docs/RELEASE_READINESS.md). Chưa chứng nhận hoàn tất beta realistic: browser/WebGL/FPS, asset cuối và nghiệm thu VPS vẫn còn thiếu bằng chứng.
 
 ## Cách chơi
 
@@ -60,7 +66,7 @@ Game luôn chơi được bằng localStorage; không cần đăng nhập. Để
 
 Trong briefing chọn **Tài khoản / cloud**, hoặc mở **Menu → Tài khoản & cloud save**. Đăng ký/đăng nhập, kiểm tra bản cloud, rồi chọn lưu hoặc tải và xác nhận. Cloud không đồng bộ tự động. Khi thiết bị khác đã cập nhật bản lưu, server trả xung đột và yêu cầu kiểm tra lại; không âm thầm ghi đè.
 
-Token chỉ giữ trong bộ nhớ; reload trang cần đăng nhập lại. Autosave 15 giây vẫn chỉ lưu local. Tải cloud/import JSON tạo một bản dự phòng local; chọn **Menu → Khôi phục trước khi nhập** để lấy lại. Lưu offline cũ `deep-command-v1` vẫn dùng được. Chi tiết ở [CLOUD_SAVE](docs/CLOUD_SAVE.md).
+Token chỉ giữ trong bộ nhớ; reload trang cần đăng nhập lại. Autosave 15 giây vẫn chỉ lưu local. Tải cloud/import JSON tạo một bản dự phòng local; chọn **Menu → Khôi phục điểm dự phòng** để lấy lại. Lưu offline cũ `deep-command-v1` vẫn dùng được. Chi tiết ở [CLOUD_SAVE](docs/CLOUD_SAVE.md).
 
 ```bash
 python -m venv .venv
@@ -73,7 +79,7 @@ uvicorn main:app --reload
 
 Mặc định dùng SQLite local. Để dùng PostgreSQL, đặt `DATABASE_URL=postgresql+psycopg://USER:PASSWORD@HOST:5432/DB` trước khi chạy `init_db.py`. Swagger: `http://localhost:8000/docs`.
 
-Docker: sao chép `.env.example` thành `.env`, đặt mật khẩu database mạnh rồi chạy `docker compose up --build`. Web ở `http://localhost:8080`; API chỉ bind loopback `127.0.0.1:8000`. Docker/PostgreSQL chưa được kiểm thử runtime trong phiên bàn giao này.
+Docker: sao chép `.env.example` thành `.env`, đặt mật khẩu database mạnh rồi chạy `docker compose up --build`. Web ở `http://localhost:8080`; API chỉ bind loopback `127.0.0.1:8000`. Docker web/API và PostgreSQL đã được chạy trong môi trường QA cục bộ; Podman/VPS production vẫn cần nghiệm thu riêng.
 
 ## Kiểm tra
 

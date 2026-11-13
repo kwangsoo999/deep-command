@@ -1,3 +1,9 @@
+import {
+  emptyCareer,
+  technologies,
+  missionUnlocked,
+  type Career,
+} from "./career";
 // Fictional game-space only. No real navigation, acoustic or weapon models.
 export type ContactStatus =
   "Unknown" | "Suspected" | "Identified" | "Lost Contact" | "Archived";
@@ -44,6 +50,7 @@ export interface Incident {
   description: string;
   cost: number;
   damage: number;
+  response?: { kind: "crew"; remaining: number };
 }
 export interface Result {
   mission: number;
@@ -54,6 +61,7 @@ export interface Result {
 }
 export interface State {
   version: 1;
+  career: Career;
   seed: number;
   time: number;
   tick: number;
@@ -196,6 +204,7 @@ const initialContacts = (): Contact[] =>
 export function createState(seed = 1947): State {
   return {
     version: 1,
+    career: emptyCareer(),
     seed,
     time: 0,
     tick: 0,
@@ -318,6 +327,8 @@ export function goals(s: State): boolean[] {
   }
 }
 export function finish(s: State, success: boolean) {
+  if (s.stage !== "active") return;
+  s.career.attempts++;
   const m = missions[s.mission];
   const objective = (goals(s).filter(Boolean).length / 3) * 40;
   const intel = Math.min(20, s.verified.length * 10);
@@ -330,7 +341,24 @@ export function finish(s: State, success: boolean) {
   const score = success
     ? Math.round(objective + intel + condition + crew + efficiency)
     : Math.min(49, Math.round(objective + condition));
-  const reward = success ? m.reward + score : 0;
+  const firstCompletion = success && !s.completed.includes(s.mission);
+  const reward = firstCompletion ? m.reward + score : 0;
+  if (success) {
+    const previous = s.career.best.find((r) => r.mission === s.mission);
+    if (
+      !previous ||
+      score > previous.score ||
+      (score === previous.score && s.time < previous.time)
+    ) {
+      s.career.best = s.career.best.filter((r) => r.mission !== s.mission);
+      s.career.best.push({
+        mission: s.mission,
+        score,
+        grade: score >= 90 ? "S" : score >= 75 ? "A" : score >= 60 ? "B" : "C",
+        time: s.time,
+      });
+    }
+  }
   s.result = {
     mission: s.mission,
     score,
@@ -348,7 +376,7 @@ export function finish(s: State, success: boolean) {
   };
   s.stage = "debrief";
   s.mode = "paused";
-  if (success && !s.completed.includes(s.mission)) {
+  if (firstCompletion) {
     s.completed.push(s.mission);
     s.credits += reward;
     s.xp += score * 10;
@@ -372,7 +400,10 @@ export function step(s: State) {
     const dx = s.waypoint.x - s.position.x,
       dy = s.waypoint.y - s.position.y,
       d = Math.hypot(dx, dy),
-      v = 0.22 * (s.upgrades.includes("automation") ? 1.3 : 1);
+      v =
+        0.22 *
+        (s.upgrades.includes("automation") ? 1.3 : 1) *
+        (s.career.research.includes("routing") ? 1.1 : 1);
     if (d <= v) {
       s.position = { ...s.waypoint };
       s.waypoint = null;
@@ -446,6 +477,13 @@ export function step(s: State) {
     };
     log(s, "CẢNH BÁO • " + names[n], "warning");
   }
+  if (s.incident?.response) {
+    s.incident.response.remaining--;
+    if (s.incident.response.remaining <= 0) {
+      log(s, "Engineering • Kíp kỹ thuật hoàn tất xử lý sự cố.", "success");
+      s.incident = null;
+    }
+  }
   if (s.incident && s.time % 10 === 0)
     s.hull = Math.max(0, s.hull - s.incident.damage);
   if (s.power <= 0 || s.hull <= 0 || s.time >= missions[s.mission].limit) {
@@ -462,7 +500,10 @@ export type Action =
   | { type: "waypoint"; x: number; y: number }
   | { type: "scan" }
   | { type: "verify"; id: string }
-  | { type: "resolve" }
+  | { type: "resolve"; choice?: "standard" | "crew" | "stabilize" }
+  | { type: "deploy"; mission: number }
+  | { type: "research"; id: string }
+  | { type: "resupply"; resource: "power" | "supplies" }
   | { type: "order"; id?: string }
   | { type: "train"; id: string }
   | { type: "rest"; id: string }
@@ -481,12 +522,45 @@ export function act(s: State, a: Action) {
     s.settings.quality = s.settings.quality === "high" ? "low" : "high";
     return;
   }
-  if (a.type === "next" || a.type === "retry") {
-    if (a.type === "next" && (!s.result?.success || s.mission >= 4)) return;
+  if (a.type === "research") {
+    const tech = technologies.find((t) => t.id === a.id);
+    if (
+      s.stage === "active" ||
+      !tech ||
+      s.career.research.includes(a.id) ||
+      s.research < tech.cost
+    )
+      return;
+    s.research -= tech.cost;
+    s.career.research.push(a.id);
+    log(s, "Research • Đã mở " + tech.name, "success");
+    return;
+  }
+  if (a.type === "resupply") {
+    const cost = a.resource === "power" ? 120 : 80,
+      amount = a.resource === "power" ? 25 : 20;
+    if (s.stage === "active" || s.credits < cost || s[a.resource] >= 100)
+      return;
+    s.credits -= cost;
+    s[a.resource] = Math.min(100, s[a.resource] + amount);
+    log(s, "Base • Đã tiếp tế " + a.resource, "success");
+    return;
+  }
+  if (a.type === "deploy" || a.type === "next" || a.type === "retry") {
+    const index =
+      a.type === "deploy"
+        ? a.mission
+        : a.type === "next"
+          ? s.mission + 1
+          : s.mission;
+    if (!missionUnlocked(s.completed, index)) return;
+    if (a.type !== "deploy" && s.stage !== "debrief") return;
+    if (a.type === "next" && !s.result?.success) return;
     const n = createState(s.seed);
     Object.assign(n, {
-      mission: a.type === "next" ? s.mission + 1 : s.mission,
+      mission: index,
       completed: s.completed,
+      career: s.career,
       credits: s.credits,
       xp: s.xp,
       research: s.research,
@@ -495,7 +569,7 @@ export function act(s: State, a: Action) {
       settings: s.settings,
       crew: s.crew.map((c) => ({ ...c, fatigue: 10 })),
       hull: Math.max(s.hull, 80),
-      power: 100,
+      power: Math.max(s.power, 60),
       supplies: Math.max(s.supplies, 60),
     });
     Object.assign(s, n);
@@ -590,6 +664,7 @@ export function act(s: State, a: Action) {
         100,
         c.confidence +
           20 +
+          (s.career.research.includes("analysis") ? 5 : 0) +
           crewBonus +
           (s.upgrades.includes("sonar") ? 12 : 0) +
           Math.floor(random(s) * 9),
@@ -615,11 +690,53 @@ export function act(s: State, a: Action) {
     log(s, `Intelligence • Đã đối chiếu ${r.id}.`, "success");
   }
   if (a.type === "resolve" && s.incident) {
+    if (s.incident.response) return;
+    if (a.choice === "crew") {
+      const engineer = s.crew.find((c) => c.role === "Engineering")!;
+      if (engineer.fatigue > 85) {
+        log(
+          s,
+          "Engineering • Kíp kỹ thuật cần nghỉ trước khi nhận việc.",
+          "warning",
+        );
+        return;
+      }
+      engineer.fatigue = Math.min(100, engineer.fatigue + 15);
+      s.incident.response = {
+        kind: "crew",
+        remaining: engineer.skill >= 85 ? 8 : 14,
+      };
+      log(
+        s,
+        "Engineering • Kíp kỹ thuật đang xử lý; thời gian chạy sẽ tiếp tục tiêu hao thân tàu.",
+      );
+      return;
+    }
+    if (a.choice === "stabilize") {
+      if (s.power < 8) {
+        log(s, "Engineering • Cần 8 năng lượng ổn định khẩn cấp.", "warning");
+        return;
+      }
+      s.power -= 8;
+      s.hull = Math.max(0, s.hull - 3);
+      log(
+        s,
+        "Engineering • Đã ổn định khẩn cấp; tổn thất 3% thân tàu.",
+        "warning",
+      );
+      s.incident = null;
+      return;
+    }
     if (s.supplies < s.incident.cost) {
       log(s, "Engineering • Thiếu vật tư xử lý.", "warning");
       return;
     }
-    s.supplies -= s.incident.cost;
+    s.supplies = Math.min(
+      100,
+      s.supplies -
+        s.incident.cost +
+        (s.career.research.includes("recycling") ? 2 : 0),
+    );
     log(s, "Engineering • Đã xử lý " + s.incident.title, "success");
     s.incident = null;
   }
@@ -673,9 +790,9 @@ export class SimulationClock {
       return;
     }
     this.accumulator += Math.max(0, Math.min(seconds, 0.5)) * state.speed;
-    while (this.accumulator >= 1) {
+    while (this.accumulator + 1e-9 >= 1) {
       step(state);
-      this.accumulator -= 1;
+      this.accumulator = Math.max(0, this.accumulator - 1);
       if (state.stage !== "active") {
         this.accumulator = 0;
         break;
@@ -815,6 +932,8 @@ export function restore(raw: string): State {
     fail();
   if (
     !Array.isArray(s.completed) ||
+    s.completed.length > 5 ||
+    new Set(s.completed).size !== s.completed.length ||
     !s.completed.every((v: any) => Number.isInteger(v) && finite(v, 0, 4)) ||
     !Array.isArray(s.verified) ||
     !s.verified.every(str) ||
@@ -833,12 +952,50 @@ export function restore(raw: string): State {
   )
     fail();
   if (
-    s.stage === "debrief" &&
+    s.result !== null &&
     (!s.result ||
+      s.result.mission !== s.mission ||
+      !["S", "A", "B", "C", "Failed"].includes(s.result.grade) ||
       typeof s.result.success !== "boolean" ||
       !finite(s.result.score, 0, 100) ||
       !finite(s.result.reward) ||
       !str(s.result.grade))
+  )
+    fail();
+  if (s.stage === "debrief" && !s.result) fail();
+  // Additive migration for v0.1–0.5 saves: preserve earned progression, do not invent best scores.
+  if (s.career === undefined) s.career = emptyCareer();
+  if (
+    !s.career ||
+    !Number.isInteger(s.career.attempts) ||
+    !finite(s.career.attempts) ||
+    !Array.isArray(s.career.best) ||
+    s.career.best.length > 5 ||
+    !s.career.best.every(
+      (r: any) =>
+        Number.isInteger(r.mission) &&
+        finite(r.mission, 0, 4) &&
+        s.completed.includes(r.mission) &&
+        finite(r.score, 0, 100) &&
+        ["S", "A", "B", "C"].includes(r.grade) &&
+        finite(r.time),
+    ) ||
+    new Set(s.career.best.map((r: any) => r.mission)).size !==
+      s.career.best.length ||
+    !Array.isArray(s.career.research) ||
+    !s.career.research.every((id: any) =>
+      technologies.some((t) => t.id === id),
+    ) ||
+    new Set(s.career.research).size !== s.career.research.length
+  )
+    fail();
+  if (
+    s.incident &&
+    s.incident.response !== undefined &&
+    (!s.incident.response ||
+      s.incident.response.kind !== "crew" ||
+      !Number.isInteger(s.incident.response.remaining) ||
+      !finite(s.incident.response.remaining, 1, 60))
   )
     fail();
   return { ...s, mode: "paused" };

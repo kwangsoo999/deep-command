@@ -52,6 +52,9 @@ import {
 const CommandRoom = lazy(() => import("./CommandRoom"));
 import "./style.css";
 import AccountPanel from "./AccountPanel";
+import CampaignPanel from "./CampaignPanel";
+import IncidentPanel from "./IncidentPanel";
+import { commandRank } from "./career";
 const fmt = (n: number) =>
   `${Math.floor(n / 60)
     .toString()
@@ -547,16 +550,21 @@ export default function App() {
   const [view, setView] = useState("Command");
   const [selected, setSelected] = useState("C-01");
   const [modal, setModal] = useState<
-    "menu" | "settings" | "help" | "account" | null
+    "menu" | "settings" | "help" | "account" | "campaign" | null
   >(null);
   const [toast, setToast] = useState("");
   const [room, setRoom] = useState(false);
+  const [preparing, setPreparing] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   const audio = useRef<AudioContext | null>(null);
   const m = missions[g.mission];
+  const saveError = useGame((s) => s.saveError);
   const done = goals(g);
   const contact = g.contacts.find((c) => c.id === selected)!;
   const notify = useCallback((text: string) => setToast(text), []);
+  useEffect(() => {
+    if (saveError) notify(saveError);
+  }, [saveError, notify]);
   const station = useCallback((s: string) => {
     setView(s);
     setRoom(false);
@@ -678,8 +686,8 @@ export default function App() {
   return (
     <div className="app" onClick={beep}>
       <header
-        inert={modal !== null || g.stage !== "active"}
-        aria-hidden={modal !== null || g.stage !== "active"}
+        inert={modal !== null || (g.stage !== "active" && !preparing)}
+        aria-hidden={modal !== null || (g.stage !== "active" && !preparing)}
       >
         <a
           className="brand"
@@ -721,8 +729,8 @@ export default function App() {
       </header>
       <div
         className="workspace"
-        inert={modal !== null || g.stage !== "active"}
-        aria-hidden={modal !== null || g.stage !== "active"}
+        inert={modal !== null || (g.stage !== "active" && !preparing)}
+        aria-hidden={modal !== null || (g.stage !== "active" && !preparing)}
       >
         <aside className="sidebar">
           <div className="sidebar-label">STATIONS</div>
@@ -757,7 +765,7 @@ export default function App() {
               <br />
               SIMULATION
               <br />
-              <b>v0.5 / ALPHA</b>
+              <b>v0.9 / ALPHA</b>
             </div>
           </div>
         </aside>
@@ -776,6 +784,14 @@ export default function App() {
               </h1>
             </div>
             <div className="clock-status">
+              {preparing && (
+                <button
+                  className="primary prep-return"
+                  onClick={() => setPreparing(false)}
+                >
+                  Chỉ thị nhiệm vụ
+                </button>
+              )}
               <div className="time">
                 <span>MISSION ELAPSED</span>
                 <b>{fmt(g.time)}</b>
@@ -1037,16 +1053,7 @@ export default function App() {
                     </button>
                   </div>
                   {g.incident ? (
-                    <div className="incident">
-                      <h3>{g.incident.title}</h3>
-                      <p>{g.incident.description}</p>
-                      <button
-                        disabled={g.supplies < g.incident.cost}
-                        onClick={() => dispatch({ type: "resolve" })}
-                      >
-                        Xử lý · {g.incident.cost} vật tư
-                      </button>
-                    </div>
+                    <IncidentPanel />
                   ) : (
                     <div className="all-clear">
                       <Shield size={28} />
@@ -1311,8 +1318,8 @@ export default function App() {
         </main>
       </div>
       <footer
-        inert={modal !== null || g.stage !== "active"}
-        aria-hidden={modal !== null || g.stage !== "active"}
+        inert={modal !== null || (g.stage !== "active" && !preparing)}
+        aria-hidden={modal !== null || (g.stage !== "active" && !preparing)}
       >
         <div className="resource">
           <span className="status-light" />
@@ -1368,7 +1375,7 @@ export default function App() {
           {toast}
         </div>
       )}
-      {g.stage === "briefing" && !modal && (
+      {g.stage === "briefing" && !modal && !preparing && (
         <div className="overlay">
           <section
             role="dialog"
@@ -1386,6 +1393,12 @@ export default function App() {
             </span>
             <h2>{m.name}</h2>
             <p className="briefing-description">{m.description}</p>
+            <p className="briefing-rank">
+              {commandRank(g.xp).name} · {g.xp} XP
+              {g.completed.includes(g.mission)
+                ? " · Chơi lại: không cấp thưởng lặp"
+                : ""}
+            </p>
             <div className="briefing-objectives">
               {m.goals.map((s, i) => (
                 <div key={s}>
@@ -1399,7 +1412,10 @@ export default function App() {
                 <Gauge size={16} /> {m.limit / 60} phút mô phỏng
               </span>
               <span>
-                <Flag size={16} /> {m.reward} C + điểm thưởng
+                <Flag size={16} />{" "}
+                {g.completed.includes(g.mission)
+                  ? "Chơi lại / cải thiện thành tích"
+                  : `${m.reward} C + điểm thưởng`}
               </span>
               <span>
                 <Shield size={16} /> {m.type}
@@ -1431,12 +1447,17 @@ export default function App() {
               >
                 Tài khoản / cloud
               </button>
-              <span>FICTIONAL WORLD · LOCAL ALPHA</span>
+              <button
+                className="text-button"
+                onClick={() => setModal("campaign")}
+              >
+                Chiến dịch & chuẩn bị
+              </button>
             </div>
           </section>
         </div>
       )}
-      {g.stage === "debrief" && !modal && g.result && (
+      {g.stage === "debrief" && !modal && !preparing && g.result && (
         <div className="overlay">
           <section
             role="dialog"
@@ -1474,6 +1495,12 @@ export default function App() {
                 <span>THỜI GIAN</span>
               </div>
             </div>
+            <button
+              className="text-button debrief-hq"
+              onClick={() => setModal("campaign")}
+            >
+              Xem hồ sơ & chuẩn bị tại căn cứ
+            </button>
             {g.result.success && g.mission === 4 ? (
               <>
                 <h3>Chiến dịch Northern Horizon hoàn tất.</h3>
@@ -1481,7 +1508,7 @@ export default function App() {
                   className="primary"
                   onClick={() => {
                     manualSave();
-                    setModal("menu");
+                    setModal("campaign");
                   }}
                 >
                   Lưu & về bộ chỉ huy
@@ -1509,7 +1536,9 @@ export default function App() {
             aria-modal="true"
             aria-label="Hộp thoại chỉ huy"
             tabIndex={-1}
-            className="dialog"
+            className={
+              modal === "campaign" ? "dialog campaign-dialog" : "dialog"
+            }
           >
             <button
               className="close"
@@ -1526,10 +1555,21 @@ export default function App() {
                   ? "Cài đặt"
                   : modal === "account"
                     ? "Tài khoản & cloud save"
-                    : "Chỉ thị chỉ huy"}
+                    : modal === "campaign"
+                      ? "Bộ chỉ huy chiến dịch"
+                      : "Chỉ thị chỉ huy"}
             </h2>
             {modal === "menu" ? (
               <div className="menu-options">
+                <button
+                  onClick={() => {
+                    if (g.mode === "running") dispatch({ type: "pause" });
+                    setModal("campaign");
+                  }}
+                >
+                  <Flag size={18} />
+                  Chiến dịch & chuẩn bị
+                </button>
                 <button onClick={() => setModal(null)}>
                   <Play size={18} /> Quay lại game <ChevronRight size={16} />
                 </button>
@@ -1560,14 +1600,14 @@ export default function App() {
                     try {
                       useGame.getState().restoreBackup();
                       setModal(null);
-                      notify("Đã khôi phục bản local trước khi nhập.");
+                      notify("Đã khôi phục điểm dự phòng local.");
                     } catch (e) {
                       notify((e as Error).message);
                     }
                   }}
                 >
                   <RotateCcw size={18} />
-                  Khôi phục trước khi nhập
+                  Khôi phục điểm dự phòng
                 </button>
                 <button onClick={manualSave}>
                   <Save size={18} /> Lưu tiến trình
@@ -1580,6 +1620,7 @@ export default function App() {
                       )
                     ) {
                       fresh();
+                      setPreparing(false);
                       setModal(null);
                       setView("Command");
                     }
@@ -1594,8 +1635,23 @@ export default function App() {
                   <Upload size={18} /> Nhập tệp lưu
                 </button>
               </div>
+            ) : modal === "campaign" ? (
+              <CampaignPanel
+                onStation={(name) => {
+                  setView(name);
+                  setRoom(false);
+                  setPreparing(true);
+                  setModal(null);
+                }}
+                onDeploy={() => {
+                  setModal(null);
+                  setPreparing(false);
+                  setView("Command");
+                  setRoom(false);
+                }}
+              />
             ) : modal === "account" ? (
-              <AccountPanel />
+              <AccountPanel onRestore={() => setPreparing(false)} />
             ) : modal === "settings" ? (
               <div className="settings">
                 <button onClick={() => dispatch({ type: "sound" })}>

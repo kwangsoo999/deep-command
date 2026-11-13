@@ -19,12 +19,20 @@ export const useGame = create<{
   fresh: () => void;
   importSave: (raw: string) => void;
   restoreBackup: () => void;
+  checkpoint: () => void;
+  saveError: string | null;
 }>((set, get) => ({
   game: createState(),
+  saveError: null,
   dispatch: (a) =>
     set((p) => {
       const game = structuredClone(p.game);
       act(game, a);
+      if (
+        ["deploy", "next", "retry"].includes(a.type) ||
+        game.mode !== p.game.mode
+      )
+        clock.reset();
       return { game };
     }),
   advance: (dt) => {
@@ -32,10 +40,23 @@ export const useGame = create<{
     if (g.mode !== "running" || g.stage !== "active") return;
     const game = structuredClone(g);
     clock.advance(game, dt);
-    if (game.time !== g.time) set({ game });
+    if (game.time !== g.time) {
+      let saveError = get().saveError;
+      if (game.stage === "debrief") {
+        try {
+          localStorage.setItem(KEY, serialize(game));
+          saveError = null;
+        } catch {
+          saveError =
+            "Không lưu được kết quả nhiệm vụ. Hãy xuất JSON để giữ tiến trình.";
+        }
+      }
+      set({ game, saveError });
+    }
   },
   save: () => {
     localStorage.setItem(KEY, serialize(get().game));
+    set({ saveError: null });
   },
   load: () => {
     const raw = localStorage.getItem(KEY);
@@ -45,7 +66,7 @@ export const useGame = create<{
   },
   fresh: () => {
     clock.reset();
-    set({ game: createState() });
+    set({ game: createState(), saveError: null });
   },
   importSave: (raw) => {
     const game = restore(raw);
@@ -53,6 +74,9 @@ export const useGame = create<{
     localStorage.setItem(KEY, serialize(game));
     clock.reset();
     set({ game });
+  },
+  checkpoint: () => {
+    localStorage.setItem(KEY + "-backup", serialize(get().game));
   },
   restoreBackup: () => {
     const raw = localStorage.getItem(KEY + "-backup");

@@ -32,3 +32,10 @@ Chi tiết data chuẩn nằm trong `src/simulation.ts`: `missions`, `upgrades`,
 Điểm: mục tiêu 40, tình báo tối đa 20, thân tàu 15, thủy thủ 15, thời gian 10. Grade S≥90/A≥75/B≥60/C, hoặc Failed. Reward chỉ ghi một lần mỗi mission. Chưa phải cân bằng cuối.
 
 Định hướng realistic/PBR trong hồ sơ gốc vẫn là đích tiếp theo. Boong hiện tại chỉ là môi trường procedural có vật liệu Standard, ánh sáng, bốn trạm và camera nhìn/zoom; chưa phải nội thất realistic đầy đủ.
+
+
+## Campaign build 0.9 additions
+
+Career ranks now derive from XP; best scores/time and attempts are recorded from new results. Preparation HQ, unlocked replay, research (3 technologies) and resupply are implemented. Replay is score-only, without duplicate credits/XP/RP. Crew repair jobs and emergency stabilization supplement the shared incident template. Entry into fleet/crew before Start is supported.
+
+These complete the current playable MVP loop. Recruitment/assignment, multiple hull classes, campaign branching and deep contradictory intel remain outside implemented scope. Final realistic art/browser performance acceptance is still incomplete; do not use earlier roadmap prompts as evidence these features already exist.

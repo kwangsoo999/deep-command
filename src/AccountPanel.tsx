@@ -12,8 +12,10 @@ import { useGame } from "./store";
 import { missions, serialize } from "./simulation";
 export default function AccountPanel({
   client = cloudClient,
+  onRestore,
 }: {
   client?: CloudClient;
+  onRestore?: () => void;
 }) {
   const [profile, setProfile] = useState(client.profile);
   const [register, setRegister] = useState(false),
@@ -269,6 +271,7 @@ export default function AccountPanel({
                             "Bản cloud không còn tồn tại. Hãy kiểm tra lại.",
                           );
                         importSave(serialize(latest.state));
+                        onRestore?.();
                         setRemote(latest);
                         setMessage(
                           "Đã tải bản cloud. Game đang tạm dừng; bản local cũ đã được dự phòng.",

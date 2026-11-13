@@ -1,43 +1,15 @@
-# Status and roadmap — 0.5.0 alpha
+# Project status — 0.9.0 campaign build
 
-This is a new implementation based on the supplied design. No previously accepted phase was available. Status refers to code and checks in this repository, not every item in the long-term brief.
+The playable single-player MVP is implemented with a complete campaign loop; final beta certification is incomplete. Read RELEASE_READINESS.md for scope and gates.
 
-| Original phase | Implemented | Remaining / verification |
+Implemented: one vessel, one fictional map/three regions, five contacts, five missions, six crew roles, eight shared-template incident types with three response options, ten equipment upgrades, three research technologies, career ranks/best records/replay, preparation hub, local and optional cloud persistence, deck/ocean graphics and deployment configurations.
+
+| Original phase | Current evidence | Remaining |
 | --- | --- | --- |
-| 01 Foundation | React/TS/Vite/Tailwind/Zustand; Three.js deck/ocean viewer; clock; menus/settings; basic API; account/cloud UI | WebGL runtime, camera station picking and visual layout QA; FPS; realistic GLB/PBR; ambient audio |
-| 02 Simulation | seeded fixed step; map pan/zoom/layers; waypoint; contacts/scan; intel expiration; events; save/import/export | source conflict logic, lost-contact lifecycle, richer department model; browser testing |
-| 03 Gameplay | 5-mission progression; goals/results/rewards; 6 officers; fatigue/train/rest; 8 shared-template incidents; 10 upgrades | recruitment/assignment/promotion, branches, rank unlocks, more diverse incident choices, broader balance QA |
-| 04 Content/visual | original SVG map and vessel diagram; detailed procedural deck, live console textures, underwater exterior/shader, camera presets; lazy load; optional UI beep | realistic assets/characters/ocean, voice/music, cinematics, LOD, FPS profiling |
-| 05 Release | build, unit/DOM/API checks; CI with real HTTP cloud round trip; revision conflict protection; Docker/Postgres config; run docs | PostgreSQL/Docker runtime, migrations, browser matrix, security review/load tests, hosted release |
+| 01 Foundation | React/TS/Three UI, actual 3D geometry, camera/clock/settings, auth API/UI | Browser/WebGL interaction and visual acceptance; full ambient audio |
+| 02 Simulation | Deterministic fixed step; map/sonar/reports/navigation/event/jobs/save; tests | Rich lost-contact/conflicting-source lifecycle and department model |
+| 03 Gameplay | Full 5-mission loop, resources/crew actions/incidents/upgrades/research/career; tests | Recruitment/assignment, branch decisions, multiple classes and wider content |
+| 04 Content | Authored procedural scenes/materials/postprocessing | Final GLB/PBR art/animated crew/voice/cinematics; actual render/FPS profiling |
+| 05 Release | Build/unit/DOM/API, HTTP/PostgreSQL and container smoke QA, CI, docs | Browser matrix, production Podman/VPS checks, production backup/security/load review |
 
-No full phase is represented as final approved/beta complete. A playable campaign core is implemented and automatically tested.
-
-## Next priorities
-
-1. Browser QA at 1920×1080, 1600×900, 1366×768 and tablet. Validate map SVG pointer math, focus, overlays, 3D station raycasting and WebGL cleanup/performance.
-2. Extract map, station panels and dialogs from App.tsx into components; retain deterministic simulation API and save compatibility.
-3. Extend cloud saves with per-slot history/account recovery after production hardening; current login/manual cloud sync/conflict protection is implemented and tested.
-4. Run PostgreSQL integration tests and compose smoke test; introduce reviewed Alembic migration, backup/restore, reverse-proxy body limits, distributed rate limiting.
-5. Commission/license realistic GLB assets, texture pipeline, crew animation, sound and benchmark on target hardware.
-6. Extend contact lifecycle/conflicting intel, rank progression, richer crew and incident mechanics; re-balance campaign with playtesting.
-
-Do not call this beta until the original release gate has real evidence.
-
-
-## v0.2 delivery
-
-AccountPanel extracted from App for the new feature. Registration/login/logout, manual cloud save/load, remote metadata, conflict handling, in-memory sessions, local backup and recovery are implemented. Tested via component/client/API checks plus a real FastAPI HTTP round trip on disposable SQLite. PostgreSQL, public API rollout and browser/WebGL QA remain unverified. No claim of beta readiness.
-
-Owner-hosted frontend tank.daitan.site is reachable (read-only HTTP/title check). Prepared Podman backend/database and Cloudflare path-routing templates preserve existing web origin 18088. API route currently returns 404; no VPS SSH or rollout has been performed.
-
-## v0.3 graphics delivery
-
-Implemented a new deck/ocean viewer with read-only simulation data, direct station commands, camera views and context recovery. Added assembly/raycast/resource/pause and fallback tests. Still not verified with a real WebGL renderer/browser and no FPS claims. See VISUALS.md.
-
-## v0.4 graphics delivery
-
-Generated surface maps/reflection environment, hull water-light shader, seabed/instanced rock dressing, wake particles, close-up cameras and exposure/HUD controls are implemented and unit/DOM-tested. No new external assets or gameplay changes. Pixel rendering, shader GPU compilation and performance still need actual browser QA.
-
-## v0.5 graphics delivery
-
-Authored spline/extrusion submarine silhouettes, live analog gauges and optional high-quality bloom/color-grade/output pipeline with three looks are implemented and CPU/DOM-tested. Low quality uses direct rendering. Visual quality and GPU/FPS validation remain open; this is still procedural alpha art.
+The owner's tank.daitan.site was previously read-only verified at v0.3.0 with working API routing. This task does not have VPS SSH access and did not update that deployment. Local container checks are separate from production acceptance.

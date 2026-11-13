@@ -15,3 +15,6 @@
 - [VPS tank.daitan.site](../deploy/VPS_TANK.md): preserve existing Podman/Cloudflare deployment, add optional same-origin API.
 
 - [Graphics 0.3](VISUALS.md): deck/exterior, controls, presentation timing and verification boundaries.
+
+- [Full play guide](USER_GUIDE.md).
+- [Release readiness and remaining gates](RELEASE_READINESS.md).

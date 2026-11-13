@@ -16,6 +16,18 @@ jobs:
       - run: npm run build
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: deepcommand
+          POSTGRES_DB: deepcommand
+          POSTGRES_PASSWORD: ci_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U deepcommand -d deepcommand"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,10 +41,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Test real HTTP cloud save round trip
+      - name: Test real HTTP and PostgreSQL cloud save round trip
         shell: bash
         run: |
-          export DATABASE_URL=sqlite:////tmp/deep-command-ci.db
+          export DATABASE_URL=postgresql+psycopg://deepcommand:ci_test_only@127.0.0.1:5432/deepcommand
           python backend/init_db.py
           python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8012 --no-access-log &
           api_pid=$!

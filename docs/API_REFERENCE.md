@@ -1,6 +1,6 @@
 # API and database reference
 
-Service: `backend/main.py`, FastAPI 0.115.12. Tài liệu tương tác `/docs`. Version 0.2.0. JSON requests; lỗi dùng `{"detail": ...}`. Bearer token từ login, hết hạn sau 86400 giây. Tất cả tài khoản/saves thật được DB lưu; game browser kết nối API khi cấu hình VITE_API_URL; cloud sync là thao tác chủ động.
+Service: `backend/main.py`, FastAPI 0.115.12. Tài liệu tương tác `/docs`. Service version 0.9.0; cloud revision contract introduced in 0.2.0. JSON requests; lỗi dùng `{"detail": ...}`. Bearer token từ login, hết hạn sau 86400 giây. Tất cả tài khoản/saves thật được DB lưu; game browser kết nối API khi cấu hình VITE_API_URL; cloud sync là thao tác chủ động.
 
 | Method/path | Auth | Input / output | Errors |
 | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ erDiagram
  players ||--o| saves : owns
 ```
 
-Initial schema only: `backend/init_db.py` executes metadata.create_all. No Alembic migrations yet. SQLite tests use StaticPool memory DB; PostgreSQL schema/config exists but runtime not verified. Database payloads are private to authenticated owner. Expired sessions denied; no scheduled cleanup yet. API mutation bodies are capped at 2,100,000 bytes before JSON/Pydantic parsing, including streaming bodies; encoded save payload is additionally limited to 2 MB. A production edge limit can add an outer bound. Add edge/distributed rate limits, TLS, migrations, observability and backup automation before exposing service publicly.
+Initial schema only: `backend/init_db.py` executes metadata.create_all. No Alembic migrations yet. SQLite tests use StaticPool memory DB; PostgreSQL schema and real HTTP save/conflict/ownership flow were exercised on a disposable Postgres 17 container. Database payloads are private to authenticated owner. Expired sessions denied; no scheduled cleanup yet. API mutation bodies are capped at 2,100,000 bytes before JSON/Pydantic parsing, including streaming bodies; encoded save payload is additionally limited to 2 MB. A production edge limit can add an outer bound. Add edge/distributed rate limits, TLS, migrations, observability and backup automation before exposing service publicly.
 
 
 ## Revision protocol (v0.2)

@@ -10,7 +10,7 @@ See root README for venv/init_db/uvicorn commands. Default SQLite is local devel
 
 ## Docker
 
-`cp .env.example .env`, set POSTGRES_PASSWORD (a long randomly generated URI-safe value), `docker compose up --build`. Static frontend at :8080, optional API :8000 bound to loopback. Web build receives VITE_API_URL (default http://localhost:8000 for local Compose). Change it before building for a real host, then rebuild; API is not automatically published. DB persists in named volume. Backend container waits for healthy DB and initializes missing tables. This is initial schema setup, not a migration system. Runtime Docker verification has not been performed.
+`cp .env.example .env`, set POSTGRES_PASSWORD (a long randomly generated URI-safe value), `docker compose up --build`. Static frontend at :8080, optional API :8000 bound to loopback. Web build receives VITE_API_URL (default http://localhost:8000 for local Compose). Change it before building for a real host, then rebuild; API is not automatically published. DB persists in named volume. Backend container waits for healthy DB and initializes missing tables. This is initial schema setup, not a migration system. Web/API Docker builds and local runtime/HTTP smoke checks were performed against disposable PostgreSQL; this does not validate the owner's Podman/VPS environment.
 
 For public backend: put API behind a TLS reverse proxy, body cap 2MB and distributed auth rate limit; remove development origins, scope CORS exactly, restrict service ports, run migrations explicitly before rollout, manage credentials outside Git. API token is bearer access and must be kept out of logs. Auth service is alpha and requires production review.
 
@@ -20,7 +20,7 @@ Browser: Menu → Xuất tệp lưu JSON, then import in same-version game. Expo
 
 ## Release checks
 
-Run frontend tests/build, backend tests, actual browser QA, actual Postgres/compose checks. CI runs frontend checks, SQLite-backed API tests and a real HTTP client/service cloud save test; CI is not proof of production deployment, Postgres compatibility or WebGL rendering.
+Run frontend tests/build, backend tests, actual browser QA, actual Postgres/compose checks. CI runs frontend checks, SQLite-backed API tests and a real HTTP client/service cloud save test with PostgreSQL and concurrent writers; CI is not proof of production deployment, Postgres compatibility or WebGL rendering.
 
 
 For manual HTTP integration QA: run a disposable backend on port 8012, then `VITE_TEST_API_URL=http://127.0.0.1:8012 npm exec vitest -- run tests/cloud.integration.test.ts`. This creates a temporary account and saves; do not point it at a production database. No hosted public service is provisioned by this repository.
@@ -28,3 +28,5 @@ For manual HTTP integration QA: run a disposable backend on port 8012, then `VIT
 ## Existing owner-hosted deployment
 
 The owner already serves the frontend at https://tank.daitan.site through Podman/Quadlet and Cloudflare Tunnel. Use [VPS_TANK](../deploy/VPS_TANK.md), preserving the existing frontend service/origin. That guide prepares an optional API route; no remote VPS deployment was executed in this task.
+
+Managed-cloud QA builds use optional BuildKit secret `proxy_ca` to trust the configured proxy during npm/pip installs. On an ordinary VPS with normal public CA trust, no secret is needed. The CA is never copied into image layers. Preserve .env/Quadlet/Tunnel files during updates and ship the entire dist directory, including lazy Three engine/effects chunks.

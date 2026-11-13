@@ -53,3 +53,12 @@ Graphics consumes State read-only through a ref, so 1-second UI updates do not r
 ## v0.5 graphics
 
 models.ts owns fictional curved hull/sail/blade geometry and analog gauges. cinema.ts owns high-quality composer passes and low-quality direct rendering. Maintain OutputPass last for color management and dispose each pass plus composer. Do not claim mock-composer tests establish framebuffer/shader/browser correctness. Look/exposure selections are ephemeral presentation settings; save schema stays v1. Keep line geometry/material disposal (analog tick marks).
+
+
+## v0.9 campaign completion pass
+
+Read RELEASE_READINESS.md before describing release status: the functional campaign loop is complete, not the full original realistic beta. career.ts defines additive Career data, ranks and technologies. CampaignPanel is HQ/preparation; IncidentPanel is three-way response UI. State.career is initialized on new saves; restore adds empty defaults for legacy v1 saves and validates new records/jobs. No DB columns or envelope version changed. Do not invent older best scores. Preserve first-completion-only rewards and score-zero reward on replay.
+
+Base preparation starts hull/power/supplies at minimum 80/60/60 and preserves larger reserves. Crew incident jobs use game ticks and serialize their remaining time. Store persists debrief transitions immediately; persistence failure retains game state and sets saveError. Mission change UI checkpoints before dispatch. One backup slot is shared with imports; do not promise full history.
+
+CI API unit tests still use SQLite; HTTP integration now uses a real PostgreSQL service and concurrent writers plus cross-account isolation. Web/API Docker images were built/run in local QA; this is not Podman/VPS acceptance. Optional proxy_ca build secret extends trust only within the install RUN and is not copied into the image. vite.config manual chunks keep Three engine/effects/viewer lazy; ship all dist assets together.
