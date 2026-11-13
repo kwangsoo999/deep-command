@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 — 2026-11-13
+
+- Rebuilt procedural command deck with curved hull/ribs, detailed consoles, plotting table, fixtures, chairs and mixed warm/cool lighting.
+- Added live canvas-texture console displays driven by current simulation state; incident lighting follows pause-aware presentation time.
+- Added underwater Aurora scene with procedural hull/fins/masts/propeller, ocean shader, suspended particles and light shafts.
+- Added camera presets with smooth transitions, orbit/zoom, deck camera bounds and reset.
+- Added direct sonar/navigation actions, keyboard-accessible station shortcuts, low-quality rendering, context-loss recovery and WebGL fallback.
+- Added assembly/raycast/disposal/presentation-clock and fallback UI tests; no save/database schema change.
+- Runtime visual quality/FPS remains unverified; no final realistic asset claim.
+
 ## 0.2.0 — 2026-11-13
 
 - Added registration/login/logout UI and explicit cloud save/load through optional configured FastAPI.

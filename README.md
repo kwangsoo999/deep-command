@@ -1,6 +1,6 @@
 # DEEP COMMAND — Silent Ocean
 
-Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.2.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
+Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.3.0 — playable alpha**, chưa phải beta hoàn chỉnh trong roadmap gốc.
 
 Bạn chỉ huy **DCS Aurora** trong chiến dịch **Northern Horizon**: đọc tình báo, nhận dạng liên lạc, đặt hành trình, xử lý sự cố và bảo vệ thủy thủ đoàn. Thế giới, tọa độ GU, sonar và giao chiến đều là cơ chế game giả tưởng.
 
@@ -35,11 +35,20 @@ Menu có lưu/tải, xuất/nhập JSON và chiến dịch mới. Autosave mỗi
 - Bản đồ SVG tương tác, 3 khu vực, 5 liên lạc; sonar, tình báo có hết hạn.
 - Simulation fixed timestep, seed xác định; pause thực sự dừng simulation.
 - 6 sĩ quan, huấn luyện/nghỉ ngơi, 8 loại sự cố, 10 nâng cấp, tài nguyên và debrief.
-- Boong 3D Three.js dựng bằng code, kéo để nhìn, cuộn zoom, click 4 màn hình mở trạm. Nạp riêng khi chọn Boong 3D.
+- Boong 3D với vòm thân tàu, khung sườn, bàn tác chiến, ghế, đường ống, màn hình cập nhật từ nhiệm vụ và ánh sáng cảnh báo.
+- Góc camera toàn boong/từng trạm; click màn hình mở trạm, quét sonar và đặt tuyến ngay trong giao diện 3D.
+- Ngoại cảnh Aurora dưới biển với mô hình thân tàu, tháp chỉ huy, chân vịt, hạt nước, mặt biển shader và tia sáng. Nạp riêng khi chọn Boong / Biển.
+- Hai mức chất lượng, phương án thao tác khi WebGL lỗi và nút nạp lại khi mất context.
 - UI tiếng Việt, giao diện dữ liệu tối, hỗ trợ bàn phím và bố cục responsive.
 - Đăng ký/đăng nhập, lưu/tải cloud qua FastAPI tùy chọn; kiểm soát xung đột bản lưu giữa các thiết bị.
 - Bản dự phòng local trước khi nhập JSON/tải cloud; khôi phục từ Menu.
 - Cấu hình PostgreSQL và Docker; CI có kiểm thử cloud save qua HTTP thật.
+
+## Đồ họa 0.3
+
+Chọn **Boong / Biển** trên thanh trạm. Dùng nút **Boong chỉ huy / Đại dương** để đổi cảnh, chọn góc nhìn camera hoặc kéo/zoom. Trong boong, chọn màn hình hoặc nút trạm để mở chức năng. Nút quét sonar/đặt tuyến tác động cùng simulation như bản đồ. Pause/Plan dừng hiệu ứng theo thời gian; camera vẫn quan sát được.
+
+Chất lượng thấp tắt bóng đổ, giảm mật độ hạt và chia lưới mặt biển. Đồ họa vẫn procedural, chưa có asset GLB/PBR cuối cùng; browser/WebGL/FPS chưa được xác minh thực tế. Xem [VISUALS](docs/VISUALS.md).
 
 ## Backend tùy chọn
 

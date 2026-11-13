@@ -6,7 +6,7 @@ StartLimitIntervalSec=300
 StartLimitBurst=30
 
 [Container]
-Image=localhost/deep-command-api:0.2.0
+Image=localhost/deep-command-api:0.3.0
 ContainerName=deep-command-api
 Network=deep-command.network
 PublishPort=127.0.0.1:18089:8000

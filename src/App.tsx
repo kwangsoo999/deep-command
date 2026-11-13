@@ -750,14 +750,14 @@ export default function App() {
               }}
             >
               <Ship size={20} />
-              <span>Boong 3D</span>
+              <span>Boong / Biển</span>
             </button>
             <div className="classification">
               FICTIONAL
               <br />
               SIMULATION
               <br />
-              <b>v0.2 / ALPHA</b>
+              <b>v0.3 / ALPHA</b>
             </div>
           </div>
         </aside>
@@ -870,7 +870,7 @@ export default function App() {
                 <div className="panel">
                   <div className="panel-head">
                     <span>
-                      <Ship size={15} /> COMMAND CENTER / PROCEDURAL 3D
+                      <Ship size={15} /> AURORA / COMMAND DECK & OCEAN
                     </span>
                     <button
                       className="text-button"
@@ -885,8 +885,12 @@ export default function App() {
                     }
                   >
                     <CommandRoom
-                      quality={g.settings.quality}
+                      game={g}
                       onStation={station}
+                      onScan={() => dispatch({ type: "scan" })}
+                      onWaypoint={() =>
+                        dispatch({ type: "waypoint", ...m.target })
+                      }
                     />
                   </Suspense>
                 </div>

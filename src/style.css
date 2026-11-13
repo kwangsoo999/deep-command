@@ -2091,3 +2091,252 @@ footer {
   flex-wrap: wrap;
   gap: 12px;
 }
+.visual-deck {
+  background: #081722;
+}
+.scene-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 13px;
+  border-bottom: 1px solid #28414e;
+  gap: 12px;
+}
+.scene-tabs {
+  display: flex;
+  gap: 7px;
+}
+.scene-toolbar button {
+  font-size: 10px;
+  padding: 8px 11px;
+}
+.scene-tabs button.active,
+.camera-presets button.active {
+  color: #a6e1de;
+  background: #244653;
+  border-color: #50838a;
+}
+.scene-viewport {
+  position: relative;
+  height: 560px;
+  background: radial-gradient(ellipse at center, #17323e, #050c13);
+  isolation: isolate;
+  overflow: hidden;
+}
+.scene-canvas {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+.scene-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.scene-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #03101b88,
+    transparent 25%,
+    transparent 55%,
+    #03101bd9
+  );
+  box-shadow: inset 0 0 100px #02080c88;
+}
+.scene-topline {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #7eabb8;
+  font: 8px monospace;
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+.scene-title {
+  position: absolute;
+  bottom: 64px;
+  left: 25px;
+  right: 20px;
+  pointer-events: none;
+}
+.scene-title .eyebrow {
+  color: #88b5bf;
+  font-size: 8px;
+}
+.scene-title h2 {
+  font-size: 25px;
+  letter-spacing: -0.8px;
+  margin: 9px 0;
+  color: #d6e7e9;
+  text-shadow: 0 2px 15px #000;
+}
+.scene-title p {
+  font-size: 10px;
+  color: #87a7b4;
+}
+.scene-stats {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #42596755;
+  display: flex;
+  gap: 25px;
+  padding: 15px 25px;
+  background: #07182499;
+  color: #6d94a7;
+  font: 8px monospace;
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+.scene-stats b {
+  color: #c2dcdf;
+  margin-left: 7px;
+  font-size: 10px;
+  font-weight: 400;
+}
+.camera-presets {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 13px;
+  flex-wrap: wrap;
+  border-top: 1px solid #29404d;
+}
+.camera-presets > svg {
+  color: #7496a8;
+}
+.camera-presets > span {
+  font: 8px monospace;
+  letter-spacing: 0.8px;
+  color: #7093a4;
+  margin-right: 5px;
+}
+.camera-presets button {
+  font-size: 9px;
+  padding: 7px 9px;
+}
+.deck-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 13px 12px;
+}
+.deck-actions button {
+  font-size: 10px;
+  padding: 9px 11px;
+}
+.scene-instructions {
+  font-size: 9px;
+  padding: 0 14px 12px;
+  color: #61879a;
+}
+.station-shortcuts {
+  display: flex;
+  border-top: 1px solid #203743;
+}
+.station-shortcuts button {
+  flex: 1;
+  background: #0d2431;
+  border: 0;
+  border-right: 1px solid #203743;
+  border-radius: 0;
+  font: 9px monospace;
+  color: #88b9c0;
+  padding: 12px 5px;
+}
+.scene-error {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 30%;
+  background: #0b1c28ed;
+  border: 1px solid #446372;
+  padding: 25px;
+  border-radius: 5px;
+  text-align: center;
+}
+.scene-error p {
+  font-size: 12px;
+  color: #d2bd8e;
+  margin-bottom: 17px;
+}
+.scene-error button {
+  font-size: 11px;
+}
+.scene-viewport:has(.scene-error) .scene-title {
+  display: none;
+}
+@media (min-width: 1700px) {
+  .scene-viewport {
+    height: 680px;
+  }
+  .scene-title h2 {
+    font-size: 32px;
+  }
+}
+@media (max-width: 600px) {
+  .scene-viewport {
+    height: 420px;
+  }
+  .scene-title {
+    left: 16px;
+    bottom: 72px;
+  }
+  .scene-title h2 {
+    font-size: 23px;
+  }
+  .scene-title p {
+    max-width: 260px;
+    font-size: 9px;
+  }
+  .scene-topline {
+    left: 13px;
+    right: 13px;
+    font-size: 6px;
+    letter-spacing: 0.3px;
+  }
+  .scene-stats {
+    padding: 13px 16px;
+    gap: 13px;
+    flex-wrap: wrap;
+    font-size: 7px;
+  }
+  .scene-stats b {
+    margin-left: 4px;
+    font-size: 8px;
+  }
+  .scene-toolbar {
+    padding: 9px;
+  }
+  .scene-toolbar button {
+    font-size: 9px;
+    padding: 7px;
+  }
+  .camera-presets {
+    gap: 6px;
+    padding: 10px;
+  }
+  .camera-presets > span {
+    display: none;
+  }
+  .deck-actions {
+    padding: 0 10px 10px;
+  }
+  .deck-actions button {
+    font-size: 9px;
+  }
+  .scene-error {
+    left: 5%;
+    right: 5%;
+    top: 25%;
+    padding: 18px;
+  }
+}

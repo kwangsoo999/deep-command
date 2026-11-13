@@ -9,7 +9,9 @@ Read this and PROJECT_INDEX.md before editing. Product: DEEP COMMAND — Silent 
 - `src/AccountPanel.tsx`: login/register/cloud UI, explicit sync confirmation.
 - `src/cloud.ts`: API boundary, in-memory token/profile, timeout, conflict/expiry handling.
 - `src/App.tsx`: stations/map/sonar/dialogs/HUD and effects. Large; split before major new UI features.
-- `src/CommandRoom.tsx`: lazy procedural Three.js scene and resource lifecycle.
+- `src/CommandRoom.tsx`: lazy deck/ocean viewer, OrbitControls, camera transitions, context recovery and direct station actions.
+- `src/graphics/scenes.ts`: Three.js assembly builders, canvas console textures, pause-aware visual clock and deduplicated resource disposal.
+- `docs/VISUALS.md`: rendering scope and QA limits.
 - `src/style.css`: layout, design tokens, breakpoints/reduced motion.
 - `tests/simulation.test.ts`: clock/determinism/full 5-mission run/save validation.
 - `tests/ui.test.tsx`: actual DOM actions, pause/scan/verify/waypoint/save controls.
@@ -38,3 +40,7 @@ Read CLOUD_SAVE.md before altering persistence. Save schema stays v1. Existing D
 ## Owner's VPS
 
 Owner reports existing Podman/Quadlet service deep-command.service, local web origin 127.0.0.1:18088, Cloudflare Tunnel. Read deploy/VPS_TANK.md. Screenshot deployment files are not in remote main; preserve VPS-local configuration. Public root was read-only verified, API version returned 404. No configured SSH/VPS write access exists in this task environment. Prepared backend origin is 127.0.0.1:18089 with same-host /api/ tunnel routing; this is a proposal, not an executed rollout.
+
+## v0.3 graphics
+
+Graphics consumes State read-only through a ref, so 1-second UI updates do not rebuild WebGL. Presentation time freezes under pause/planning; camera stays interactive. Five camera presets in deck and one exterior preset. Preserve disposeScene deduplication and dispose controls/observer/RAF/listeners on switching scene/quality. No new save fields. WebGL context loss exposes reload UI. Assembly and DOM-fallback tests do not prove rendered output or FPS.

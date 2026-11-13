@@ -13,3 +13,11 @@ No remote image/model/audio downloads or embedded third-party reference images. 
 | typography | src/style.css | System font stack | No downloaded font assets |
 
 Three.js and its code are MIT; React/Zustand/Vite and other packages retain their respective licenses in package metadata. This repository adds no broad open-source license for owner-created game content. Audit third-party licenses again when distributing a packaged release. All screenshots/model renders/FPS remain unverified in this handoff.
+
+## v0.3 additions (source: src/graphics/scenes.ts)
+
+- Replaced command-room placeholder layout with detailed procedural curved deck and interactive console meshes.
+- Five dynamic CanvasTexture displays (four stations + navigation plotting table) use simulated runtime state. No external textures.
+- Added Aurora exterior geometry, original ocean shader, deterministic particle field and translucent light-shaft geometry.
+- Three.js OrbitControls from the same MIT dependency provides camera interaction.
+- All are procedural development assets, not final realistic GLB/PBR assets. See VISUALS.md for exact scope and unverified render quality.
