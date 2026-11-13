@@ -807,9 +807,13 @@ export default function App() {
                       <span>
                         <Compass size={15} /> TACTICAL NAVIGATION
                       </span>
-                      <span className="muted">
-                        {m.region} <i className="live-dot" />
-                      </span>
+                      <button
+                        className="text-button"
+                        onClick={() => setRoom(true)}
+                      >
+                        <Ship size={14} />
+                        Quan sát Aurora 3D
+                      </button>
                     </div>
                     <TacticalMap
                       g={g}
