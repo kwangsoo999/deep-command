@@ -10,6 +10,7 @@ import {
   type CameraView,
   type SceneMode,
 } from "./graphics/scenes";
+import { createCinema, looks, type Look } from "./graphics/cinema";
 import type { State } from "./simulation";
 export default function CommandRoom({
   game,
@@ -31,6 +32,9 @@ export default function CommandRoom({
     [retry, setRetry] = useState(0);
   const [exposure, setExposure] = useState(1.25),
     [clean, setClean] = useState(false);
+  const [look, setLook] = useState<Look>("cinema");
+  const lookRef = useRef(look);
+  lookRef.current = look;
   const exposureRef = useRef(exposure);
   exposureRef.current = exposure;
   const viewRef = useRef<CameraView>(view);
@@ -72,6 +76,12 @@ export default function CommandRoom({
     const initial = cameraViews[mode === "ocean" ? "ocean" : "bridge"];
     camera.position.fromArray(initial.position);
     camera.lookAt(new T.Vector3().fromArray(initial.target));
+    const cinema = createCinema(
+      renderer,
+      assembly.scene,
+      camera,
+      quality === "high",
+    );
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.fromArray(initial.target);
     controls.enableDamping = true;
@@ -137,6 +147,7 @@ export default function CommandRoom({
         h = el.clientHeight;
       if (!w || !h) return;
       renderer.setSize(w, h);
+      cinema.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     };
@@ -176,8 +187,7 @@ export default function CommandRoom({
         camera.lookAt(controls.target);
       }
       assembly.update(g, visualTime);
-      renderer.toneMappingExposure = exposureRef.current;
-      renderer.render(assembly.scene, camera);
+      cinema.render(lookRef.current, exposureRef.current);
       frame = requestAnimationFrame(draw);
     };
     frame = requestAnimationFrame(draw);
@@ -190,6 +200,7 @@ export default function CommandRoom({
       renderer.domElement.removeEventListener("pointerup", up);
       renderer.domElement.removeEventListener("pointercancel", cancel);
       renderer.domElement.removeEventListener("webglcontextlost", lost);
+      cinema.dispose();
       assembly.dispose();
       renderer.dispose();
       renderer.domElement.remove();
@@ -245,6 +256,27 @@ export default function CommandRoom({
         <button aria-pressed={clean} onClick={() => setClean((v) => !v)}>
           {clean ? "Hiện HUD" : "Ẩn HUD"}
         </button>
+      </div>
+      <div
+        className="scene-style-controls"
+        role="group"
+        aria-label="Phong cách hình ảnh"
+      >
+        {(Object.keys(looks) as Look[]).map((id) => (
+          <button
+            key={id}
+            aria-pressed={look === id}
+            className={look === id ? "active" : ""}
+            onClick={() => setLook(id)}
+          >
+            {looks[id].label}
+          </button>
+        ))}
+        <span>
+          {quality === "high"
+            ? "BLOOM / COLOR GRADE"
+            : "LIGHT MODE / NO POST FX"}
+        </span>
       </div>
       <div className={clean ? "scene-viewport clean-view" : "scene-viewport"}>
         <div className="scene-canvas" ref={host} />

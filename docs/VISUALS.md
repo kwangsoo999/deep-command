@@ -1,4 +1,4 @@
-# Graphics v0.4 — implementation reference
+# Graphics v0.5 — implementation reference
 
 ## What changed
 
@@ -6,7 +6,7 @@
 
 Deck: curved interior shell, ribs, grated/planked floor treatment, bulkhead wheel, four stations with keypads and labeled data screens, chairs, pipes, vents, central plotting table, observation mast, warm ceiling fixtures and cyan strips. High quality enables one shadow-casting spotlight; incident lights use game/presentation time.
 
-Exterior: original capsule-based Aurora hull with seam rings, sail, masts, fins and seven-blade propeller. Underwater fog, transparent animated surface shader, light-shaft meshes and deterministic suspended particles add depth. It is an artistic game model, not an engineering reconstruction or final asset.
+Exterior: original curved Aurora hull with seam rings, sail, masts, fins and seven-blade propeller. Underwater fog, transparent animated surface shader, light-shaft meshes and deterministic suspended particles add depth. It is an artistic game model, not an engineering reconstruction or final asset.
 
 ## Interaction
 
@@ -38,3 +38,14 @@ Seabed is a deformed plane and an InstancedMesh rock group (48 high/16 low). Par
 Exterior presets now include bow/sail/stern. Exposure range 0.7–1.8 and Hide HUD let players inspect details without changing saved game settings or progression. Low quality reduces generated texture resolution and scene budgets. Shared textures, reflection maps and instance resources are explicitly disposed on scene changes. No new save/database fields.
 
 Four added appearance tests check deterministic texture data, color-space handling, encoded normals, quality dimensions, bubble alpha, shader injection anchors and lifecycle of terrain/wake/environment resources. Viewer DOM tests cover close-up buttons/exposure/HUD state without WebGL. Real lighting/material review, screenshots and FPS remain unverified.
+
+
+## v0.5 silhouette and cinema pass
+
+`graphics/models.ts` contains the fictional hull spline/LatheGeometry, beveled sail profile, curved propeller blade profile and analog gauges. High/low variants use different subdivisions. No engineering dimensions or external models are used. Gauges consume hull/power read-only; line tick geometry/materials are now included in disposal.
+
+`graphics/cinema.ts` owns high-quality EffectComposer passes: RenderPass → UnrealBloomPass → color-grade/vignette ShaderPass → OutputPass. Bloom defaults mild; natural disables it and sets grade/vignette to zero. OutputPass handles tone mapping/output color space. Every pass and composer target is disposed on scene/quality changes; resizing follows viewport dimensions.
+
+Low quality allocates no composer/passes and renders the scene directly. All three looks still change exposure/fog tint in that mode; the UI labels it LIGHT MODE / NO POST FX. Look selection is presentation-only, not saved gameplay data. Bloom adds render-target/bandwidth costs; no FPS guarantee is made. Renderer setup, GPU framebuffers and pixels have not been verified in an actual browser.
+
+Geometry tests check finite positions, subdivision differences and tapered shape; gauge tests check data-driven needles. Pipeline tests mock the composer to check pass ordering, sizing, natural-mode disable and ownership/disposal. They do not execute GPU postprocessing. Existing picking, save, campaign and fallback tests still run.

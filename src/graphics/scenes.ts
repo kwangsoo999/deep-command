@@ -5,6 +5,12 @@ import {
   addWaterLight,
   createBubbleTexture,
 } from "./appearance";
+import {
+  createHullGeometry,
+  createSailGeometry,
+  createBladeGeometry,
+  createGauge,
+} from "./models";
 import type { State } from "../simulation";
 export const stationNames = [
   "Sonar",
@@ -50,7 +56,11 @@ export function disposeScene(scene: T.Scene) {
     materials = new Set<T.Material>(),
     textures = new Set<T.Texture>();
   scene.traverse((o) => {
-    if (o instanceof T.Mesh || o instanceof T.Points) {
+    if (
+      o instanceof T.Mesh ||
+      o instanceof T.Points ||
+      o instanceof T.LineSegments
+    ) {
       if (o instanceof T.InstancedMesh) o.dispose();
       geometries.add(o.geometry);
       for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
@@ -160,6 +170,7 @@ export function createAssembly(
     wake: T.Points | undefined;
   const waterClock = { value: 0 };
   const alertLights: T.PointLight[] = [];
+  const gauges: { needle: T.Mesh; stat: "power" | "hull" }[] = [];
   if (mode === "deck") {
     scene.background = new T.Color("#060e14");
     scene.fog = new T.FogExp2("#0a1922", 0.027);
@@ -195,6 +206,16 @@ export function createAssembly(
     bulkhead.scale.x = 1.48;
     box(1.7, 3.4, 0.15, 0, 1.7, -8.25, dark);
     box(1.4, 2.9, 0.1, 0, 1.7, -8.12, steel);
+    for (const [x, stat] of [
+      [-2.7, "power"],
+      [2.7, "hull"],
+    ] as const) {
+      const gauge = createGauge(brass);
+      gauge.group.position.set(x, 2.8, -8.1);
+      gauge.group.name = "status-gauge-" + stat;
+      scene.add(gauge.group);
+      gauges.push({ needle: gauge.needle, stat });
+    }
     const wheel = mesh(
       new T.TorusGeometry(0.33, 0.035, 8, 24),
       brass,
@@ -340,13 +361,7 @@ export function createAssembly(
       roughness: 0.88,
     });
     addWaterLight(hull, waterClock);
-    const main = mesh(
-      new T.CapsuleGeometry(1.3, 14, 12, high ? 40 : 20),
-      hull,
-      0,
-      0,
-      0,
-    );
+    const main = mesh(createHullGeometry(high), hull, 0, 0, 0);
     main.rotation.x = Math.PI / 2;
     main.scale.x = 1.13;
     main.name = "aurora-hull";
@@ -360,7 +375,7 @@ export function createAssembly(
       );
       seam.scale.x = 1.13;
     }
-    box(0.65, 1.8, 2.8, 0, 1.75, -1, hull);
+    mesh(createSailGeometry(high), hull, 0, 1.85, -1);
     box(0.7, 0.12, 3, 0, 2.7, -1, dark);
     for (const x of [-0.24, 0.2]) {
       const mast = mesh(
@@ -383,14 +398,13 @@ export function createAssembly(
     propeller = new T.Group();
     propeller.position.set(0, 0, 8.7);
     scene.add(propeller);
+    const hub = new T.Mesh(new T.CylinderGeometry(0.2, 0.24, 0.65, 16), brass);
+    hub.rotation.x = Math.PI / 2;
+    propeller.add(hub);
+    const bladeGeometry = createBladeGeometry(high);
     for (let i = 0; i < 7; i++) {
-      const blade = new T.Mesh(new T.BoxGeometry(0.22, 1.5, 0.12), brass);
-      blade.position.set(
-        Math.sin((i * Math.PI * 2) / 7) * 0.62,
-        Math.cos((i * Math.PI * 2) / 7) * 0.62,
-        0,
-      );
-      blade.rotation.z = (-i * Math.PI * 2) / 7 + 0.35;
+      const blade = new T.Mesh(bladeGeometry, brass);
+      blade.rotation.z = (i * Math.PI * 2) / 7;
       propeller.add(blade);
     }
     // Stylized terrain establishes distance without using real geography.
@@ -530,6 +544,8 @@ export function createAssembly(
       }
       for (const light of alertLights)
         light.intensity = g.incident ? 12 + Math.sin(time * 4) * 4 : 0;
+      for (const gauge of gauges)
+        gauge.needle.rotation.z = 2.2 - (g[gauge.stat] / 100) * 4.4;
       waterClock.value = time;
       if (wake) {
         wake.visible = Boolean(g.waypoint);

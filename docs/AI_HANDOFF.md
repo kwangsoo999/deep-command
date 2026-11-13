@@ -49,3 +49,7 @@ Graphics consumes State read-only through a ref, so 1-second UI updates do not r
 ## v0.4 graphics
 
 `graphics/appearance.ts` owns deterministic generated DataTextures (albedo/normal/roughness, equirectangular reflection and bubble alpha) and onBeforeCompile water light. Color maps/reflection are sRGB; normal/roughness are non-color. Keep texture/shadow/InstancedMesh disposal intact. Caustic shader is tested against Three's standard shader anchors, not compiled by a real GPU in current QA. Additional exterior camera presets and exposure/HUD controls are presentation-only and do not change save schema. Terrain is artistic, not geographic data. See VISUALS.md.
+
+## v0.5 graphics
+
+models.ts owns fictional curved hull/sail/blade geometry and analog gauges. cinema.ts owns high-quality composer passes and low-quality direct rendering. Maintain OutputPass last for color management and dispose each pass plus composer. Do not claim mock-composer tests establish framebuffer/shader/browser correctness. Look/exposure selections are ephemeral presentation settings; save schema stays v1. Keep line geometry/material disposal (analog tick marks).

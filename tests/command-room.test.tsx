@@ -90,3 +90,29 @@ it("offers close-up exterior cameras and presentation-only exposure/HUD controls
   expect(screen.getByRole("button", { name: "Đuôi tàu" })).toBeTruthy();
   expect(JSON.stringify(game)).toBe(before);
 });
+
+it("switches visual looks without touching saved gameplay", () => {
+  const game = createState(),
+    before = JSON.stringify(game);
+  render(
+    <CommandRoom
+      game={game}
+      onStation={vi.fn()}
+      onScan={vi.fn()}
+      onWaypoint={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Biển sâu" }));
+  expect(
+    screen
+      .getByRole("button", { name: "Biển sâu" })
+      .getAttribute("aria-pressed"),
+  ).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "Tự nhiên" }));
+  expect(
+    screen
+      .getByRole("button", { name: "Tự nhiên" })
+      .getAttribute("aria-pressed"),
+  ).toBe("true");
+  expect(JSON.stringify(game)).toBe(before);
+});

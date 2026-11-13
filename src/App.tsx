@@ -757,7 +757,7 @@ export default function App() {
               <br />
               SIMULATION
               <br />
-              <b>v0.4 / ALPHA</b>
+              <b>v0.5 / ALPHA</b>
             </div>
           </div>
         </aside>

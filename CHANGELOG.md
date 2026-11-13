@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 — 2026-11-13
+
+- Replaced capsule hull/box sail/rectangular propeller blades with curved lathed hull and beveled authored sail/blade silhouettes.
+- Added analog hull/power gauges driven from live game state.
+- Added high-quality render/bloom/color-grade/output pipeline with mild vignette and three visual looks; low quality renders directly.
+- Added geometry validity/quality/taper tests, pipeline order/lifecycle tests and visual-style controls tests.
+- Save/API contract unchanged. Pixel appearance, GPU shader compilation and FPS remain unverified; no production rollout performed.
+
 ## 0.4.0 — 2026-11-13
 
 - Added original procedural albedo, normal and roughness maps for brushed steel/acoustic hull and generated reflection environment.

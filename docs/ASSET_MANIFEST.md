@@ -25,3 +25,7 @@ Three.js and its code are MIT; React/Zustand/Vite and other packages retain thei
 ## v0.4 generated assets
 
 `src/graphics/appearance.ts` generates surface albedo/normal/roughness maps, LDR reflection map and soft particle alpha in memory. No third-party textures are downloaded. Seabed geometry and instanced rocks are created in scenes.ts. These are original procedural development assets, not scanned material packs or final GLB art.
+
+## v0.5 authored geometry and rendering
+
+models.ts generates curved hull, bevel-edged sail and swept blade geometry plus analog gauges. cinema.ts uses Three.js MIT example postprocessing modules (RenderPass, UnrealBloomPass, ShaderPass, OutputPass) and an original color-grade shader. No external models/textures are downloaded. This remains authored procedural game art; actual render quality is unverified.

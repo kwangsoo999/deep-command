@@ -2391,3 +2391,41 @@ footer {
     width: 90px;
   }
 }
+.scene-style-controls {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-bottom: 1px solid #28414e;
+  background: linear-gradient(100deg, #102732, #0a1b26);
+}
+.scene-style-controls button {
+  font-size: 10px;
+  padding: 7px 12px;
+  background: #0c1c28;
+  color: #829eac;
+}
+.scene-style-controls button.active {
+  background: #24434c;
+  border-color: #638783;
+  color: #c0ddd3;
+}
+.scene-style-controls > span {
+  margin-left: auto;
+  color: #587f92;
+  font: 7px monospace;
+  letter-spacing: 1px;
+}
+@media (max-width: 600px) {
+  .scene-style-controls {
+    padding: 9px 10px;
+    gap: 6px;
+  }
+  .scene-style-controls button {
+    font-size: 9px;
+    padding: 7px 9px;
+  }
+  .scene-style-controls > span {
+    display: none;
+  }
+}

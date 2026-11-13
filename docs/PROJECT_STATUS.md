@@ -1,4 +1,4 @@
-# Status and roadmap — 0.4.0 alpha
+# Status and roadmap — 0.5.0 alpha
 
 This is a new implementation based on the supplied design. No previously accepted phase was available. Status refers to code and checks in this repository, not every item in the long-term brief.
 
@@ -37,3 +37,7 @@ Implemented a new deck/ocean viewer with read-only simulation data, direct stati
 ## v0.4 graphics delivery
 
 Generated surface maps/reflection environment, hull water-light shader, seabed/instanced rock dressing, wake particles, close-up cameras and exposure/HUD controls are implemented and unit/DOM-tested. No new external assets or gameplay changes. Pixel rendering, shader GPU compilation and performance still need actual browser QA.
+
+## v0.5 graphics delivery
+
+Authored spline/extrusion submarine silhouettes, live analog gauges and optional high-quality bloom/color-grade/output pipeline with three looks are implemented and CPU/DOM-tested. Low quality uses direct rendering. Visual quality and GPU/FPS validation remain open; this is still procedural alpha art.
