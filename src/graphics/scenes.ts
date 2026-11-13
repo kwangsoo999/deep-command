@@ -25,12 +25,17 @@ export const cameraViews = {
   Navigation: { position: [-1.2, 2.15, -1.7], target: [-1.2, 1.9, -5.4] },
   Engineering: { position: [1.2, 2.15, -1.7], target: [1.2, 1.9, -5.4] },
   Intelligence: { position: [3.6, 2.15, -1.7], target: [3.6, 1.9, -5.4] },
-  ocean: { position: [17, 9, 21], target: [0, 0, 0] },
+  ocean: { position: [13, 4, 5], target: [0, 0, 0] },
   bow: { position: [9, 3, -13], target: [0, 0, -3] },
   sail: { position: [6, 4, 2], target: [0, 1.6, -1] },
   stern: { position: [7, 2, 16], target: [0, 0, 6] },
 } as const;
 export type CameraView = keyof typeof cameraViews;
+export function frameScale(aspect: number, mode: SceneMode) {
+  return mode === "ocean"
+    ? Math.min(2.6, Math.max(1, 1.65 / Math.max(0.2, aspect)))
+    : 1;
+}
 export interface Assembly {
   scene: T.Scene;
   targets: T.Mesh[];
@@ -92,8 +97,8 @@ export function createAssembly(
 ): Assembly {
   const scene = new T.Scene(),
     targets: T.Mesh[] = [];
-  scene.environment = createReflectionMap(high);
-  scene.environmentIntensity = mode === "deck" ? 0.55 : 0.8;
+  scene.environment = createReflectionMap(high, mode);
+  scene.environmentIntensity = mode === "deck" ? 0.7 : 0.55;
   const steel = new T.MeshStandardMaterial({
     ...createSurfaceMaps(high, "steel"),
     color: 0x34454b,
@@ -321,10 +326,14 @@ export function createAssembly(
     );
     mast.name = "observation-mast";
     box(0.5, 0.25, 0.25, 2.4, 1.8, 2.5, rubber);
-    scene.add(new T.HemisphereLight(0x9bb6c1, 0x18232d, 1.35));
+    scene.add(new T.HemisphereLight(0xaacbd1, 0x26343d, 2.1));
+    const bounce = new T.DirectionalLight(0xa8ccd2, 1.8);
+    bounce.position.set(-2, 3, 5);
+    bounce.target.position.set(0, 1, -4);
+    scene.add(bounce, bounce.target);
     for (const z of [-5, 0, 5]) {
       box(1.6, 0.05, 0.22, 0, 5.68, z, warm);
-      const light = new T.PointLight(0xffdcac, 24, 10, 2);
+      const light = new T.PointLight(0xffdcac, 34, 12, 2);
       light.position.set(0, 4.8, z);
       scene.add(light);
     }
@@ -348,12 +357,15 @@ export function createAssembly(
       scene.add(key, key.target);
     }
   } else {
-    scene.background = new T.Color("#042335");
-    scene.fog = new T.FogExp2("#042335", 0.023);
-    scene.add(new T.HemisphereLight(0x71bed0, 0x061321, 2));
+    scene.background = new T.Color("#0a3041");
+    scene.fog = new T.FogExp2("#0a3041", 0.028);
+    scene.add(new T.HemisphereLight(0xa3ccd2, 0x112331, 2.8));
     const sun = new T.DirectionalLight(0xa5e7ef, 3);
     sun.position.set(-12, 18, 5);
     scene.add(sun);
+    const fill = new T.DirectionalLight(0x8bd2df, 1.8);
+    fill.position.set(12, 4, -8);
+    scene.add(fill);
     const hull = new T.MeshStandardMaterial({
       ...createSurfaceMaps(high, "acoustic"),
       color: 0x607c86,
@@ -479,12 +491,22 @@ export function createAssembly(
     wake.name = "propeller-wake";
     scene.add(wake);
     ocean = new T.ShaderMaterial({
+      fog: true,
       side: T.DoubleSide,
       transparent: true,
       depthWrite: false,
-      uniforms: { uTime: { value: 0 } },
-      vertexShader: `uniform float uTime; varying vec3 vP; void main(){vec3 p=position; p.z+=sin(p.x*.16+uTime*.35)*.5+cos(p.y*.2+uTime*.2)*.35;vP=p;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
-      fragmentShader: `uniform float uTime; varying vec3 vP; void main(){float c=sin(vP.x*.5+sin(vP.y*.3+uTime*.15))*cos(vP.y*.6+uTime*.2);gl_FragColor=vec4(vec3(.06,.26,.34)+c*.055,.34);}`,
+      uniforms: T.UniformsUtils.merge([
+        T.UniformsLib.fog,
+        { uTime: { value: 0 } },
+      ]),
+      vertexShader: `#include <fog_pars_vertex>
+      uniform float uTime; varying vec3 vP; void main(){vec3 p=position;p.z+=sin(p.x*.16+uTime*.35)*.22+cos(p.y*.2+uTime*.2)*.18;vP=p;vec4 mvPosition=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mvPosition;
+      #include <fog_vertex>
+      }`,
+      fragmentShader: `#include <fog_pars_fragment>
+      uniform float uTime;varying vec3 vP;void main(){float c=sin(vP.x*.3+sin(vP.y*.2+uTime*.15))*cos(vP.y*.35+uTime*.2);gl_FragColor=vec4(vec3(.07,.25,.3)+c*.018,.2);
+      #include <fog_fragment>
+      }`,
     });
     const surface = mesh(
       new T.PlaneGeometry(150, 150, high ? 64 : 24, high ? 64 : 24),
@@ -512,12 +534,13 @@ export function createAssembly(
       }),
     );
     scene.add(particles);
-    const rays = new T.MeshBasicMaterial({
-      color: 0x8bd3d7,
+    const rays = new T.ShaderMaterial({
       transparent: true,
-      opacity: 0.025,
       depthWrite: false,
       side: T.DoubleSide,
+      blending: T.AdditiveBlending,
+      vertexShader: `varying vec3 vN;varying vec3 vView;varying vec2 vUv;void main(){vUv=uv;vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vView=-mv.xyz;gl_Position=projectionMatrix*mv;}`,
+      fragmentShader: `varying vec3 vN;varying vec3 vView;varying vec2 vUv;void main(){float center=pow(abs(dot(normalize(vN),normalize(vView))),3.);float fade=pow(sin(clamp(vUv.y,0.,1.)*3.14159265),2.);gl_FragColor=vec4(.15,.39,.45,center*fade*.035);}`,
     });
     for (let i = 0; i < 5; i++) {
       const ray = mesh(

@@ -1,4 +1,4 @@
-# Graphics v0.5 — implementation reference
+# Graphics v0.9.1 — implementation reference
 
 ## What changed
 
@@ -24,7 +24,7 @@ Models/materials are still procedural. There are no GLB assets or scanned PBR te
 
 Automated assembly tests verify station raycasts from presets, live display refresh, exterior construction, lower particle count, visual time semantics and deduplicated disposal. DOM tests deliberately simulate unavailable WebGL and verify accessible actions/error state. None of these renders pixels.
 
-Real browser screenshots, visual review of material/light balance, control feel, clipping, shader compatibility, context recovery and FPS/memory profiling remain required. The managed environment has no callable cua_repl.js; the Sites workflow prohibits installing/improvising another browser QA path in that case. No screenshot or FPS result is claimed.
+Chromium software-render screenshots and selected control/context-recovery checks are now available in BROWSER_QA.md. Broader shader/device compatibility and hardware FPS/memory profiling remain required. Current automated Chromium/SwiftShader render/control/screenshots are recorded in BROWSER_QA.md. Older CPU-only verification notes below describe earlier milestones; hardware FPS remains unverified.
 
 
 ## v0.4 surface and atmosphere pass
@@ -49,3 +49,10 @@ Four added appearance tests check deterministic texture data, color-space handli
 Low quality allocates no composer/passes and renders the scene directly. All three looks still change exposure/fog tint in that mode; the UI labels it LIGHT MODE / NO POST FX. Look selection is presentation-only, not saved gameplay data. Bloom adds render-target/bandwidth costs; no FPS guarantee is made. Renderer setup, GPU framebuffers and pixels have not been verified in an actual browser.
 
 Geometry tests check finite positions, subdivision differences and tapered shape; gauge tests check data-driven needles. Pipeline tests mock the composer to check pass ordering, sizing, natural-mode disable and ownership/disposal. They do not execute GPU postprocessing. Existing picking, save, campaign and fallback tests still run.
+
+
+## 0.9.1 observed rendering pass
+
+Actual Chromium/SwiftShader rendering exposed hard light-shaft edges, excessive dark fill/reflection striping and portrait cropping. Shafts now fade by view-normal angle/height; ocean surface includes Three fog chunks; reflection strips are reduced for the ocean environment. Fill lights and CSS overlay opacity were adjusted. Exterior default camera is closer with a tighter lens; narrow aspect scales distance and widens lens, while deck widens its portrait lens.
+
+Immersive panel expands within the browser viewport, traps focus, exits with Escape and has direct pause/resume. Renderer resources are resized rather than recreated for expansion. See BROWSER_QA.md for actual shader/control/screenshot evidence; earlier unverified-render statements above are historical. Hardware FPS and broad device coverage remain open.

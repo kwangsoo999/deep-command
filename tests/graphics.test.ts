@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import * as T from "three";
 import {
   cameraViews,
+  frameScale,
   advanceVisualTime,
   createAssembly,
   disposeScene,
@@ -114,4 +115,27 @@ it("freezes visual time in pause/planning and resets after loading an older save
   expect(advanceVisualTime(10.2, 10, g, 0.1)).toBe(10.2);
   g.time = 2;
   expect(advanceVisualTime(10.2, 10, g, 0.1)).toBe(2);
+});
+
+it("fits the whole exterior hull into portrait framing rather than cropping its ends", () => {
+  const aspect = 390 / 525;
+  const preset = cameraViews.ocean;
+  const target = new T.Vector3().fromArray(preset.target),
+    position = new T.Vector3()
+      .fromArray(preset.position)
+      .sub(target)
+      .multiplyScalar(frameScale(aspect, "ocean"))
+      .add(target);
+  position.y = Math.min(9.5, position.y);
+  const camera = new T.PerspectiveCamera(50, aspect, 0.1, 220);
+  camera.position.copy(position);
+  camera.lookAt(target);
+  camera.updateMatrixWorld();
+  for (const z of [-8.5, 9.0])
+    for (const x of [-1.5, 1.5]) {
+      const p = new T.Vector3(x, 0, z).project(camera);
+      expect(Math.abs(p.x)).toBeLessThan(1);
+    }
+  expect(frameScale(2.5, "ocean")).toBe(1);
+  expect(frameScale(aspect, "deck")).toBe(1);
 });

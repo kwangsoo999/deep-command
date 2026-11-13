@@ -68,3 +68,14 @@ it("opens cloud access from briefing without starting the mission", () => {
   expect(useGame.getState().game.stage).toBe("briefing");
   expect(useGame.getState().game.time).toBe(0);
 });
+
+it("selects a contact with Space without pausing the simulation", () => {
+  render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Nhận quyền chỉ huy" }));
+  fireEvent.keyDown(screen.getByRole("button", { name: "C-03" }), {
+    key: " ",
+    code: "Space",
+  });
+  expect(useGame.getState().game.mode).toBe("running");
+  expect(screen.getByText(/SELECTED CONTACT \/ C-03/)).toBeTruthy();
+});

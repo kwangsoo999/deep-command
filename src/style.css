@@ -2139,12 +2139,12 @@ footer {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    #03101b88,
+    #03101b33,
     transparent 25%,
     transparent 55%,
-    #03101bd9
+    #03101b99
   );
-  box-shadow: inset 0 0 100px #02080c88;
+  box-shadow: inset 0 0 70px #02080c33;
 }
 .scene-topline {
   position: absolute;
@@ -2631,5 +2631,53 @@ footer {
   }
   .clock-status:has(.prep-return) .time {
     display: none;
+  }
+}
+
+.visual-deck.immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  border: 1px solid #365a69;
+  height: 100dvh;
+  background: #071923;
+}
+.visual-deck.immersive .scene-viewport {
+  flex: 1;
+  min-height: 230px;
+  height: auto;
+}
+.visual-deck.immersive .scene-toolbar,
+.visual-deck.immersive .scene-look-controls,
+.visual-deck.immersive .scene-style-controls,
+.visual-deck.immersive .camera-presets,
+.visual-deck.immersive .deck-actions,
+.visual-deck.immersive .station-shortcuts {
+  flex-shrink: 0;
+}
+.visual-deck.immersive .scene-title h2 {
+  font-size: 28px;
+}
+.visual-deck.immersive .scene-grain {
+  background: linear-gradient(
+    180deg,
+    #03101b22,
+    transparent 30%,
+    transparent 70%,
+    #03101b77
+  );
+}
+.visual-deck.immersive .scene-instructions {
+  padding-bottom: 6px;
+}
+@media (max-width: 600px) {
+  .visual-deck.immersive .scene-viewport {
+    min-height: 210px;
+  }
+  .visual-deck.immersive .scene-title h2 {
+    font-size: 22px;
   }
 }

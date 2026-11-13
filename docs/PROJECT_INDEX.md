@@ -18,3 +18,5 @@
 
 - [Full play guide](USER_GUIDE.md).
 - [Release readiness and remaining gates](RELEASE_READINESS.md).
+
+- [Browser QA](BROWSER_QA.md): deployed baseline, graphics fixes, screenshots and reproducible automation.

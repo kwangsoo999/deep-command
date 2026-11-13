@@ -116,3 +116,42 @@ it("switches visual looks without touching saved gameplay", () => {
   ).toBe("true");
   expect(JSON.stringify(game)).toBe(before);
 });
+
+it("opens an immersive dialog and exits it with Escape while keeping gameplay intact", () => {
+  const game = createState(),
+    before = JSON.stringify(game);
+  render(
+    <CommandRoom
+      game={game}
+      onStation={vi.fn()}
+      onScan={vi.fn()}
+      onWaypoint={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Phóng to 3D" }));
+  const dialog = screen.getByRole("dialog", {
+    name: "Visualisation Aurora 3D",
+  });
+  expect(dialog.getAttribute("aria-modal")).toBe("true");
+  fireEvent.keyDown(dialog, { key: "Escape" });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(JSON.stringify(game)).toBe(before);
+});
+
+it("provides a working pause command in the viewer when supplied by the game", () => {
+  const game = createState();
+  game.stage = "active";
+  game.mode = "running";
+  const pause = vi.fn();
+  render(
+    <CommandRoom
+      game={game}
+      onStation={vi.fn()}
+      onScan={vi.fn()}
+      onWaypoint={vi.fn()}
+      onPause={pause}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Tạm dừng game" }));
+  expect(pause).toHaveBeenCalledTimes(1);
+});

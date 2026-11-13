@@ -25,11 +25,11 @@ Preserve working core and save schema; add migrations before changing saved stat
 
 ## Current limits
 
-See PROJECT_STATUS and QA_REPORT. Most significant: no actual browser/WebGL/FPS verification, existing tank.daitan.site frontend/API last read-only verified at v0.3.0, no real PostgreSQL/Docker runtime evidence, no migration pipeline or final art. Rank unlocks/advanced crew/branching/intel conflict are absent. No claim of full beta.
+Read BROWSER_QA.md for actual Chromium/SwiftShader campaign/render/picking/context recovery evidence. Hardware FPS/memory, non-Chromium/physical devices, final realistic assets and original advanced GDD systems remain unverified/incomplete. PostgreSQL and Docker smoke evidence exists from 0.9.0. The live baseline was 0.9.0; 0.9.1 still requires owner rollout. No full beta certification.
 
 ## How to continue
 
-Run README commands; execute tests before/after changes. Begin browser QA when approved runtime tools are available, then more component extraction and production cloud infrastructure. Avoid rebuilding the repository from scratch. Update CHANGELOG and evidence-backed docs when scope changes. API auth tests use SQLite; add Postgres tests before deployment. Resource values and upgrades intentionally fictional and balance is preliminary.
+Run README commands; execute tests before/after changes. Run the repeatable Playwright suite, extend physical-device/browser performance coverage, then more component extraction and production cloud infrastructure. Avoid rebuilding the repository from scratch. Update CHANGELOG and evidence-backed docs when scope changes. API auth tests use SQLite; add Postgres tests before deployment. Resource values and upgrades intentionally fictional and balance is preliminary.
 
 
 ## v0.2 contract
@@ -39,7 +39,7 @@ Read CLOUD_SAVE.md before altering persistence. Save schema stays v1. Existing D
 
 ## Owner's VPS
 
-Owner reports existing Podman/Quadlet service deep-command.service, local web origin 127.0.0.1:18088, Cloudflare Tunnel. Read deploy/VPS_TANK.md. Screenshot deployment files are not in remote main; preserve VPS-local configuration. Public root/assets/API were read-only verified at v0.3.0 after owner rollout; protected profile/save returned 401 without login. No configured SSH/VPS write access exists in this task environment. Prepared backend origin is 127.0.0.1:18089 with same-host /api/ tunnel routing; this is a proposal, not an executed rollout.
+Owner reports existing Podman/Quadlet service deep-command.service, local web origin 127.0.0.1:18088, Cloudflare Tunnel. Read deploy/VPS_TANK.md. Screenshot deployment files are not in remote main; preserve VPS-local configuration. Public root/assets/API and UI campaign were checked at v0.9.0; no production account/save records were written. No configured SSH/VPS write access exists in this task environment. Prepared backend origin is 127.0.0.1:18089 with same-host /api/ tunnel routing; this is a proposal, not an executed rollout.
 
 ## v0.3 graphics
 
@@ -62,3 +62,12 @@ Read RELEASE_READINESS.md before describing release status: the functional campa
 Base preparation starts hull/power/supplies at minimum 80/60/60 and preserves larger reserves. Crew incident jobs use game ticks and serialize their remaining time. Store persists debrief transitions immediately; persistence failure retains game state and sets saveError. Mission change UI checkpoints before dispatch. One backup slot is shared with imports; do not promise full history.
 
 CI API unit tests still use SQLite; HTTP integration now uses a real PostgreSQL service and concurrent writers plus cross-account isolation. Web/API Docker images were built/run in local QA; this is not Podman/VPS acceptance. Optional proxy_ca build secret extends trust only within the install RUN and is not copied into the image. vite.config manual chunks keep Three engine/effects/viewer lazy; ship all dist assets together.
+
+
+## v0.9.1 browser-led pass
+
+Read BROWSER_QA.md. This is an existing VPS/repository workflow; automated Playwright is supported by cloud-environment-runtime and uses installed system Chromium or an official Playwright browser. Earlier reports applied the Sites-hosting no-CUA restriction too broadly; the absence of interactive desktop control does not itself prevent this repository's automated browser QA.
+
+The live 0.9.0 campaign passed via UI (keyboard contact workaround), and candidate passed via mouse selection. Keep contact's full transparent SVG hit rect and stop Space propagation so it does not pause the game. Immersive mode owns focus/Escape and adjusts renderer through ResizeObserver without recreating gameplay. Exterior framing scales with aspect to avoid hull cropping. Production Dockerfile must copy public/ for favicon.
+
+Browser CI runs tests/browser/run.cjs after build, completing the campaign with controlled timers, checking high desktop/low portrait WebGL, real console picking and one injected context loss. No backend account/save writes occur on the live domain. Current GPU evidence is SwiftShader, not hardware FPS, real mobile or cross-browser certification. Do not regress to describing all rendering as untested, or claim full performance certification.

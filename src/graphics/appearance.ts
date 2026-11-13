@@ -60,7 +60,10 @@ export function createSurfaceMaps(high: boolean, kind: "steel" | "acoustic") {
     roughnessMap: texture(roughness),
   };
 }
-export function createReflectionMap(high: boolean) {
+export function createReflectionMap(
+  high: boolean,
+  mode: "deck" | "ocean" = "deck",
+) {
   const width = high ? 256 : 128,
     height = width / 2,
     data = new Uint8Array(width * height * 4);
@@ -70,7 +73,8 @@ export function createReflectionMap(high: boolean) {
         v = y / height,
         strip =
           Math.exp(-(((v - 0.35) * 18) ** 2)) *
-          Math.pow(Math.max(0, Math.cos(u * Math.PI * 8)), 20),
+          Math.pow(Math.max(0, Math.cos(u * Math.PI * 8)), 20) *
+          (mode === "ocean" ? 0.12 : 1),
         sky = Math.max(0, 1 - v),
         i = (y * width + x) * 4;
       data.set(
@@ -107,8 +111,8 @@ export function addWaterLight(
       shader.fragmentShader.replace(
         "#include <emissivemap_fragment>",
         `#include <emissivemap_fragment>
- float waterPattern=sin(vWaterWorld.x*2.3+sin(vWaterWorld.z*1.4+uWaterTime*.25))*sin(vWaterWorld.z*2.8-uWaterTime*.3);
- float waterLight=pow(abs(waterPattern),16.0)*.22;
+ float waterPattern=sin(vWaterWorld.x*.8+sin(vWaterWorld.z*.6+uWaterTime*.25))*sin(vWaterWorld.z*1.1-uWaterTime*.3);
+ float waterLight=pow(abs(waterPattern),8.0)*.065;
  totalEmissiveRadiance+=vec3(.08,.5,.55)*waterLight;`,
       );
   };

@@ -20,7 +20,7 @@ https://tank.daitan.site/api/...    → same tunnel     → 127.0.0.1:18089 → 
 3. Build the API image:
 
    ```bash
-   podman build -f backend/Dockerfile -t localhost/deep-command-api:0.9.0 backend
+   podman build -f backend/Dockerfile -t localhost/deep-command-api:0.9.1 backend
    ```
 
 4. Copy the four Quadlet files (`*.container`, `*.network`, `*.volume`) from `deploy/podman/` into the existing **user/rootless** Quadlet directory (normally `$HOME/.config/containers/systemd/`). The API restarts on initial DB-startup failures; systemd start rate limits are configured. These templates assume modern Podman with Quadlet and network DNS. If existing services are root-owned, adapt paths/units instead of mixing scopes.
@@ -34,11 +34,11 @@ https://tank.daitan.site/api/...    → same tunnel     → 127.0.0.1:18089 → 
 
    Inspect service logs if DB initialization is still in progress. Do not proceed until API health/version succeed. Named volume retains PostgreSQL across container replacement; do not delete it during updates. `init_db.py` only initializes missing tables; it is not a future schema migration system.
 5. In the **existing tunnel's** configuration, add the path-specific API rule before the web rule, preserving tunnel ID/credentials/all unrelated hostnames and final fallback. `cloudflared-ingress.fragment.yml` shows only the target rules; it is not a complete replacement config. For a dashboard-managed tunnel, configure equivalent hostname/path routes in that dashboard. Validate using the tunnel's installed configuration workflow and reload/restart the correct tunnel service.
-6. Verify `https://tank.daitan.site/api/version` now returns JSON version `0.9.0`. Do not point the frontend at localhost; that would refer to each player's own computer. Preserve Authorization headers and bypass any custom cache-everything rule for `/api/`.
+6. Verify `https://tank.daitan.site/api/version` now returns JSON version `0.9.1`. Do not point the frontend at localhost; that would refer to each player's own computer. Preserve Authorization headers and bypass any custom cache-everything rule for `/api/`.
 7. Build web with the actual origin:
 
    ```bash
-   podman build --build-arg VITE_API_URL=https://tank.daitan.site -t localhost/deep-command:0.9.0 .
+   podman build --build-arg VITE_API_URL=https://tank.daitan.site -t localhost/deep-command:0.9.1 .
    ```
 
    Update **only Image=** in the existing working frontend Quadlet to this new tag, keeping its `127.0.0.1:18088` mapping and other settings. Reload user systemd and restart `deep-command.service` in its existing scope. Replacing the file blindly could discard the operator's settings.

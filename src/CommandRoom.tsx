@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Anchor, Camera, Compass, Radio, RotateCcw, Waves } from "lucide-react";
 import {
   cameraViews,
+  frameScale as getFrameScale,
   advanceVisualTime,
   createAssembly,
   stationNames,
@@ -17,11 +18,13 @@ export default function CommandRoom({
   onStation,
   onScan,
   onWaypoint,
+  onPause,
 }: {
   game: State;
   onStation: (station: string) => void;
   onScan: () => void;
   onWaypoint: () => void;
+  onPause?: () => void;
 }) {
   const host = useRef<HTMLDivElement>(null),
     live = useRef(game);
@@ -39,6 +42,50 @@ export default function CommandRoom({
   exposureRef.current = exposure;
   const viewRef = useRef<CameraView>(view);
   viewRef.current = view;
+  const [immersive, setImmersive] = useState(false);
+  const panel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!immersive) return;
+    const el = panel.current;
+    if (!el) return;
+    const previous = document.activeElement as HTMLElement | null;
+    el.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        setImmersive(false);
+      }
+      if (e.key === "Tab") {
+        const items = Array.from(
+          el.querySelectorAll<HTMLElement>(
+            'button:not(:disabled),input,[tabindex="0"]',
+          ),
+        );
+        if (!items.length) return;
+        const first = items[0],
+          last = items[items.length - 1];
+        if (
+          e.shiftKey &&
+          (document.activeElement === first || document.activeElement === el)
+        ) {
+          e.preventDefault();
+          last.focus();
+        } else if (
+          !e.shiftKey &&
+          (document.activeElement === last || document.activeElement === el)
+        ) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    el.addEventListener("keydown", key);
+    return () => {
+      el.removeEventListener("keydown", key);
+      previous?.focus();
+    };
+  }, [immersive]);
   const quality = game.settings.quality;
   useEffect(() => {
     const el = host.current;
@@ -72,7 +119,12 @@ export default function CommandRoom({
         ? "Boong chỉ huy Aurora 3D"
         : "Tàu Aurora dưới đại dương 3D",
     );
-    const camera = new T.PerspectiveCamera(58, 1, 0.1, 220);
+    const camera = new T.PerspectiveCamera(
+      mode === "ocean" ? 42 : 58,
+      1,
+      0.1,
+      220,
+    );
     const initial = cameraViews[mode === "ocean" ? "ocean" : "bridge"];
     camera.position.fromArray(initial.position);
     camera.lookAt(new T.Vector3().fromArray(initial.target));
@@ -142,10 +194,24 @@ export default function CommandRoom({
     renderer.domElement.addEventListener("pointerup", up);
     renderer.domElement.addEventListener("pointercancel", cancel);
     renderer.domElement.addEventListener("webglcontextlost", lost);
+    let frameScale = 1;
     const resize = () => {
       const w = el.clientWidth,
         h = el.clientHeight;
       if (!w || !h) return;
+      const nextScale = getFrameScale(w / h, mode);
+      camera.position
+        .sub(controls.target)
+        .multiplyScalar(nextScale / frameScale)
+        .add(controls.target);
+      if (transition)
+        destination
+          .sub(target)
+          .multiplyScalar(nextScale / frameScale)
+          .add(target);
+      frameScale = nextScale;
+      camera.fov =
+        mode === "ocean" ? (w / h < 1 ? 50 : 42) : w / h < 1 ? 70 : 58;
       renderer.setSize(w, h);
       cinema.setSize(w, h);
       camera.aspect = w / h;
@@ -166,6 +232,7 @@ export default function CommandRoom({
         const preset = cameraViews[currentView];
         destination.fromArray(preset.position);
         target.fromArray(preset.target);
+        destination.sub(target).multiplyScalar(frameScale).add(target);
         previousView = currentView;
         transition = true;
       }
@@ -211,7 +278,14 @@ export default function CommandRoom({
     setView(next === "ocean" ? "ocean" : "bridge");
   };
   return (
-    <div className="visual-deck">
+    <div
+      className={immersive ? "visual-deck immersive" : "visual-deck"}
+      ref={panel}
+      role={immersive ? "dialog" : "region"}
+      aria-modal={immersive ? true : undefined}
+      aria-label="Visualisation Aurora 3D"
+      tabIndex={-1}
+    >
       <div className="scene-toolbar">
         <div className="scene-tabs">
           <button
@@ -229,6 +303,12 @@ export default function CommandRoom({
             Đại dương
           </button>
         </div>
+        <button
+          aria-pressed={immersive}
+          onClick={() => setImmersive((v) => !v)}
+        >
+          {immersive ? "Thu nhỏ 3D" : "Phóng to 3D"}
+        </button>
         <button
           aria-label="Đặt lại góc nhìn 3D"
           onClick={() => {
@@ -356,6 +436,11 @@ export default function CommandRoom({
         ))}
       </div>
       <div className="deck-actions">
+        {onPause && (
+          <button disabled={game.stage !== "active"} onClick={onPause}>
+            {game.mode === "running" ? "Tạm dừng game" : "Tiếp tục game"}
+          </button>
+        )}
         <button
           disabled={
             game.stage !== "active" || game.mode !== "running" || game.power < 3

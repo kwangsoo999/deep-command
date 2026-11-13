@@ -318,11 +318,22 @@ function TacticalMap({
                 onSelect(c.id);
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") onSelect(c.id);
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSelect(c.id);
+                }
               }}
               opacity={c.resolved ? 0.35 : 1}
             >
-              <circle r="23" fill="transparent" />
+              <rect
+                x="-25"
+                y="-27"
+                width="200"
+                height="54"
+                fill="transparent"
+                pointerEvents="all"
+              />
               {selected === c.id && (
                 <circle
                   r="25"
@@ -765,7 +776,7 @@ export default function App() {
               <br />
               SIMULATION
               <br />
-              <b>v0.9 / ALPHA</b>
+              <b>v0.9.1 / ALPHA</b>
             </div>
           </div>
         </aside>
@@ -907,6 +918,7 @@ export default function App() {
                     <CommandRoom
                       game={g}
                       onStation={station}
+                      onPause={() => dispatch({ type: "pause" })}
                       onScan={() => dispatch({ type: "scan" })}
                       onWaypoint={() =>
                         dispatch({ type: "waypoint", ...m.target })

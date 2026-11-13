@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.1 — 2026-11-13 / browser-led visual fixes
+
+- Tested deployed 0.9.0 in actual Chromium, completed five missions and restored persisted campaign using keyboard contact selection as a baseline workaround.
+- Fixed SVG contact hit area and Space selection propagation; candidate mouse-based playthrough passes.
+- Added SVG favicon and production image copy of public assets.
+- Increased deck fill, softened water shafts and surface fog, reduced exterior reflection banding, adjusted exterior lens/portrait framing.
+- Added immersive 3D panel with Escape/focus handling and in-view pause/resume.
+- Added repeatable Playwright campaign/render/picking/context-loss tests and browser CI artifact evidence. Software WebGL is not a hardware FPS benchmark.
+
 ## 0.9.0 — 2026-11-13 / campaign completion pass
 
 - Added campaign HQ with mission unlock/replay, preflight fleet/crew access, ranks, personal best records, resupply and research.

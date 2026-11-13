@@ -1,6 +1,6 @@
 # DEEP COMMAND — Silent Ocean
 
-Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.9.0 — campaign build**, chưa phải beta hoàn chỉnh trong roadmap gốc.
+Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.9.1 — campaign build / visual fixes**, chưa phải beta hoàn chỉnh trong roadmap gốc.
 
 Bạn chỉ huy **DCS Aurora** trong chiến dịch **Northern Horizon**: đọc tình báo, nhận dạng liên lạc, đặt hành trình, xử lý sự cố và bảo vệ thủy thủ đoàn. Thế giới, tọa độ GU, sonar và giao chiến đều là cơ chế game giả tưởng.
 
@@ -19,7 +19,7 @@ Mở địa chỉ Vite in trong terminal, thường là `http://localhost:5173`.
 
 Luồng chơi đã nối từ briefing/chuẩn bị → 5 nhiệm vụ → debrief/thưởng → hồ sơ cuối chiến dịch → chơi lại. Bộ chỉ huy có chọn mission đã mở, cấp bậc, điểm tốt nhất, tiếp tế và nghiên cứu. Sự cố có ba phương án, gồm công việc kỹ thuật theo thời gian. Lưu kết quả local ngay khi nhiệm vụ kết thúc.
 
-Xem [hướng dẫn chơi trọn chiến dịch](docs/USER_GUIDE.md) và [phạm vi nghiệm thu](docs/RELEASE_READINESS.md). Chưa chứng nhận hoàn tất beta realistic: browser/WebGL/FPS, asset cuối và nghiệm thu VPS vẫn còn thiếu bằng chứng.
+Xem [hướng dẫn chơi trọn chiến dịch](docs/USER_GUIDE.md) và [phạm vi nghiệm thu](docs/RELEASE_READINESS.md). Chưa chứng nhận hoàn tất beta realistic: shader/scene/control đã có Chromium software-WebGL smoke QA; FPS phần cứng, các trình duyệt khác, asset cuối và nghiệm thu VPS bản mới vẫn còn thiếu bằng chứng.
 
 ## Cách chơi
 
@@ -58,7 +58,7 @@ Bản 0.5 thêm thân tàu tạo theo đường cong, tháp chỉ huy bo cạnh 
 
 Bản 0.4 bổ sung các lớp màu/normal/roughness sinh từ code cho kim loại và tấm phủ thân tàu, môi trường phản chiếu, vệt sáng nước, địa hình đáy biển/đá dựng theo cụm và dòng nước sau chân vịt khi có hành trình. Camera ngoại cảnh có thêm Mũi tàu, Tháp chỉ huy, Đuôi tàu. Thanh Độ sáng và nút Ẩn HUD chỉ thay cách quan sát, không đổi tiến trình.
 
-Chất lượng thấp tắt bóng đổ, giảm mật độ hạt và chia lưới mặt biển. Đồ họa vẫn procedural, chưa có asset GLB/PBR cuối cùng; browser/WebGL/FPS chưa được xác minh thực tế. Xem [VISUALS](docs/VISUALS.md).
+Chất lượng thấp tắt bóng đổ, giảm mật độ hạt và chia lưới mặt biển. Đồ họa vẫn procedural, chưa có asset GLB/PBR cuối cùng; đã render trong Chromium/SwiftShader nhưng chưa benchmark FPS GPU thực. Xem [VISUALS](docs/VISUALS.md).
 
 ## Backend tùy chọn
 
@@ -89,7 +89,7 @@ npm run build
 .venv/bin/pytest -q backend/test_api.py
 ```
 
-Xem [QA_REPORT](docs/QA_REPORT.md) để biết phạm vi bằng chứng và giới hạn. Chưa xác minh trực quan WebGL, FPS và các trình duyệt; không tuyên bố đáp ứng 60 FPS hoặc beta release gate.
+Xem [QA_REPORT](docs/QA_REPORT.md) để biết phạm vi bằng chứng và giới hạn. Đã kiểm thử browser/render/control trên Chromium software WebGL, chưa benchmark FPS GPU thực hoặc các trình duyệt khác; không tuyên bố đáp ứng 60 FPS hoặc beta release gate.
 
 ## VPS đang sử dụng
 
@@ -100,3 +100,10 @@ Chủ dự án đang phục vụ frontend tại [tank.daitan.site](https://tank.
 Bắt đầu từ [PROJECT_INDEX](docs/PROJECT_INDEX.md) và [AI_HANDOFF](docs/AI_HANDOFF.md). Ưu tiên QA trình duyệt, chia nhỏ UI, tích hợp tài khoản/cloud save, migration database và thay asset procedural bằng GLB/PBR được cấp phép.
 
 Tài sản hình ảnh, sơ đồ và âm thanh hiện tại được tạo bằng code; icon thuộc Lucide (ISC). Chưa có nhạc, voice, model GLB, texture PBR hay nhân vật animation. Không có API key/secret trong repository.
+
+
+## Kiểm thử trình duyệt & bản sửa 0.9.1
+
+Thêm ánh sáng bù cho boong, tia sáng mềm và sương mặt biển, giảm sọc phản chiếu; camera biển gần hơn và tự lùi khi viewport hẹp. Chọn **Phóng to 3D** để tránh footer che cảnh, Escape hoặc Thu nhỏ 3D để trở về; có nút pause/resume ngay trong viewer. Vùng nhấp nhãn contact và favicon 404 đã được sửa.
+
+Chạy `npm run build` rồi `npm run test:browser` sau khi `npx playwright install --with-deps chromium`. CI chạy cả 5 nhiệm vụ và render deck/ocean trên ba viewport. Xem [bằng chứng browser QA](docs/BROWSER_QA.md), bao gồm phạm vi live/candidate và giới hạn của software rendering.
