@@ -165,15 +165,15 @@ async function visuals(viewport, low = false) {
     const state = await p.locator(".scene-canvas canvas").evaluate((c) => {
       const gl = c.getContext("webgl2");
       return {
-        width: c.width,
-        height: c.height,
+        bufferWidth: c.width,
+        bufferHeight: c.height,
         webgl: !!gl,
         error: gl?.getError(),
       };
     });
     assert.equal(state.webgl, true);
     assert.equal(state.error, 0);
-    assert.ok(state.width > 0 && state.height > 0);
+    assert.ok(state.bufferWidth > 0 && state.bufferHeight > 0);
     const filename = `${scene}-${viewport.width}x${viewport.height}-${low ? "low" : "high"}.png`;
     await p.screenshot({ path: path.join(out, filename) });
     report.views.push({
@@ -185,6 +185,45 @@ async function visuals(viewport, low = false) {
     });
   }
   if (viewport.width === 1366) {
+    for (const name of ["Mũi tàu", "Tháp chỉ huy", "Đuôi tàu"]) {
+      await p.getByRole("button", { name, exact: true }).click();
+      await p.waitForTimeout(1200);
+      assert.equal(
+        await p
+          .locator(".scene-canvas canvas")
+          .evaluate((c) => c.getContext("webgl2").getError()),
+        0,
+      );
+      const filename =
+        name === "Tháp chỉ huy"
+          ? "ocean-sail.png"
+          : name === "Mũi tàu"
+            ? "ocean-bow.png"
+            : "ocean-stern.png";
+      await p.screenshot({ path: path.join(out, filename) });
+    }
+    await p.getByRole("button", { name: "Toàn cảnh", exact: true }).click();
+    for (const name of ["Tự nhiên", "Biển sâu", "Điện ảnh"]) {
+      await p.getByRole("button", { name, exact: true }).click();
+      await p.waitForTimeout(600);
+      assert.equal(
+        await p
+          .locator(".scene-canvas canvas")
+          .evaluate((c) => c.getContext("webgl2").getError()),
+        0,
+      );
+      await p.screenshot({
+        path: path.join(
+          out,
+          name === "Tự nhiên"
+            ? "look-natural.png"
+            : name === "Biển sâu"
+              ? "look-abyss.png"
+              : "look-cinema.png",
+        ),
+      });
+    }
+    report.exteriorPresets = "bow / sail / stern; all three looks rendered";
     report.injectingContextLoss = true;
     const injected = await p.locator(".scene-canvas canvas").evaluate((c) => {
       const ext = c.getContext("webgl2").getExtension("WEBGL_lose_context");

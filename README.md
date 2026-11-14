@@ -1,6 +1,6 @@
 # DEEP COMMAND — Silent Ocean
 
-Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.9.1 — campaign build / visual fixes**, chưa phải beta hoàn chỉnh trong roadmap gốc.
+Game web chiến thuật chỉ huy tàu ngầm, dựa trên hồ sơ thiết kế DEEP COMMAND do chủ dự án cung cấp. **v0.9.2 — campaign build / exterior refinement**, chưa phải beta hoàn chỉnh trong roadmap gốc.
 
 Bạn chỉ huy **DCS Aurora** trong chiến dịch **Northern Horizon**: đọc tình báo, nhận dạng liên lạc, đặt hành trình, xử lý sự cố và bảo vệ thủy thủ đoàn. Thế giới, tọa độ GU, sonar và giao chiến đều là cơ chế game giả tưởng.
 
@@ -93,7 +93,7 @@ Xem [QA_REPORT](docs/QA_REPORT.md) để biết phạm vi bằng chứng và gi�
 
 ## VPS đang sử dụng
 
-Chủ dự án đang phục vụ frontend tại [tank.daitan.site](https://tank.daitan.site) qua Podman/systemd và Cloudflare Tunnel. API `/api/version` trả 404 khi kiểm tra; bản cloud 0.2 cần cập nhật frontend và bổ sung backend/routing. Xem [hướng dẫn riêng cho VPS](deploy/VPS_TANK.md). Các file Quadlet là mẫu bổ sung, chưa được chạy trên VPS trong phiên này.
+Chủ dự án đang phục vụ frontend tại [tank.daitan.site](https://tank.daitan.site) qua Podman/systemd và Cloudflare Tunnel. Kiểm tra ngày 14/11/2026: API `/api/version` trả 0.9.0 và giao diện vẫn là bản cũ; mã nguồn 0.9.2 cần được triển khai lên VPS. Xem [hướng dẫn riêng cho VPS](deploy/VPS_TANK.md). Các file Quadlet là mẫu bổ sung, chưa được chạy trên VPS trong phiên này.
 
 ## Tiếp tục phát triển
 
@@ -107,3 +107,8 @@ Tài sản hình ảnh, sơ đồ và âm thanh hiện tại được tạo bằ
 Thêm ánh sáng bù cho boong, tia sáng mềm và sương mặt biển, giảm sọc phản chiếu; camera biển gần hơn và tự lùi khi viewport hẹp. Chọn **Phóng to 3D** để tránh footer che cảnh, Escape hoặc Thu nhỏ 3D để trở về; có nút pause/resume ngay trong viewer. Vùng nhấp nhãn contact và favicon 404 đã được sửa.
 
 Chạy `npm run build` rồi `npm run test:browser` sau khi `npx playwright install --with-deps chromium`. CI chạy cả 5 nhiệm vụ và render deck/ocean trên ba viewport. Xem [bằng chứng browser QA](docs/BROWSER_QA.md), bao gồm phạm vi live/candidate và giới hạn của software rendering.
+
+
+## Ngoại cảnh 0.9.2
+
+Vỏ tàu dùng vân tile nhẹ hơn; cánh lái có đường cong, thêm cửa bảo trì và chữ AURORA trên tháp. Đá nằm theo địa hình, nền cát có gợn nhẹ và sương khớp màu với nền xa để tránh đường viền đáy biển. Bản lưu v1 vẫn tương thích. Xem ảnh thực tế và phạm vi kiểm tra trong [BROWSER_QA](docs/BROWSER_QA.md).

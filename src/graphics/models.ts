@@ -59,6 +59,29 @@ export function createBladeGeometry(high: boolean) {
   g.translate(0, 0, -0.035);
   return g;
 }
+// Swept, beveled control surface; dimensions are artistic scene units.
+export function createControlPlane(span: number, chord: number, high: boolean) {
+  const shape = new T.Shape();
+  shape.moveTo(0, -chord * 0.55);
+  shape.lineTo(span * 0.76, -chord * 0.25);
+  shape.quadraticCurveTo(span, -chord * 0.12, span, chord * 0.12);
+  shape.lineTo(span * 0.8, chord * 0.3);
+  shape.lineTo(0, chord * 0.5);
+  shape.closePath();
+  const geometry = new T.ExtrudeGeometry(shape, {
+    depth: 0.065,
+    bevelEnabled: true,
+    bevelSegments: high ? 3 : 1,
+    bevelSize: 0.025,
+    bevelThickness: 0.015,
+    steps: 1,
+    curveSegments: high ? 8 : 3,
+  });
+  geometry.translate(0, 0, -0.0325);
+  geometry.rotateX(Math.PI / 2);
+  return geometry;
+}
+
 export function createGauge(material: T.Material) {
   const group = new T.Group();
   const ring = new T.Mesh(new T.TorusGeometry(0.45, 0.055, 8, 32), material);

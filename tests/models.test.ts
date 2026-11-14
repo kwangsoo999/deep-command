@@ -4,6 +4,7 @@ import {
   createHullGeometry,
   createSailGeometry,
   createBladeGeometry,
+  createControlPlane,
 } from "../src/graphics/models";
 import { createAssembly } from "../src/graphics/scenes";
 import { createState, serialize } from "../src/simulation";
@@ -19,6 +20,7 @@ describe("Authored fictional submarine geometry", () => {
       createHullGeometry,
       createSailGeometry,
       createBladeGeometry,
+      (high: boolean) => createControlPlane(1.75, 1.15, high),
     ]) {
       const hi = create(true),
         lo = create(false);

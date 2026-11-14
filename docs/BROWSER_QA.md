@@ -1,4 +1,4 @@
-# Browser QA — 2026-11-13 / live 0.9.0 and candidate 0.9.1
+# Browser QA — updated 2026-11-14 / live 0.9.0 and candidate 0.9.2
 
 These are actual browser runs, not DOM mocks. Playwright 1.62.1 controlled installed Chromium 156.0.8078.79, headless with ANGLE/SwiftShader software WebGL. TLS verification remained enabled and the managed proxy/CA configuration was retained.
 
@@ -12,7 +12,7 @@ A pointer interaction defect was reproduced: clicking the center of a contact gr
 
 Live deck and ocean both rendered with no JavaScript/shader errors in the tested route; the known favicon request was reported separately. Live visuals are the old build until the owner deploys the candidate.
 
-## Candidate verification
+## Candidate verification (0.9.1 baseline, repeated for 0.9.2)
 
 - Full 5-mission UI playthrough, all grade S, with mouse contact selection and persisted reload.
 - Deck and ocean rendered at 1366×768 high, 1920×1080 high and 390×844 low; WebGL2 available and getError() returned 0 for each sampled canvas.
@@ -24,15 +24,27 @@ Live deck and ocean both rendered with no JavaScript/shader errors in the tested
 
 The browser test runs in CI, saving screenshots/report as the browser-evidence artifact. Local successful reports and screenshots are generated under test-results/browser by default. Each isolated profile is discarded after testing.
 
+## 2026-11-14 follow-up
+
+Live API metadata still reports 0.9.0. Fresh query/no-cache requests returned the same index-R-elXO7b.js and index-r5Cnd1b0.css assets with Cloudflare DYNAMIC status; this was not merely an old local browser profile. The frontend still lacks Phóng to 3D and shows the old narrow exterior camera/hard light shafts, independently confirming the earlier viewer remains deployed. A fresh isolated run rendered deck/ocean at all three viewports, physically clicked the navigation console, and returned without overflow. The known old favicon 404 remains; no unexpected JS/shader or HTTP errors occurred. This follow-up was graphics-only on production; the five-mission live campaign result above belongs to 2026-11-13.
+
+Local 0.9.2 repeated all five missions via mouse, all grade S, and restored the final saved campaign. Graphics checks cover 1366×768 high, 1920×1080 high and 390×844 low, picking and one injected context recovery. Browser automation additionally captured bow, sail and stern presets and all three looks at 1366×768. No unexpected console/page/HTTP errors; WebGL2 getError()=0 at the sampled checks. The final low-quality backdrop material correction was followed by a fresh graphics sweep; campaign logic was unchanged.
+
+Inspected images show lower-contrast hull tiles, curved control surfaces, sail lettering, dorsal hatches and a continuous fog background. Far terrain and background share the current look tint; backdrop skips per-material tone mapping in direct/low mode because Three's fog is mixed after that stage. High mode maps both through OutputPass. Portrait framing retains the whole hull.
+
+The runner now records viewport width/height separately from bufferWidth/bufferHeight. Earlier reports overwrote viewport dimensions with canvas buffer dimensions; screenshot filenames still correctly identified the test viewport.
+
 ## Candidate screenshots
 
-Captured from the locally served candidate, not the production domain. The screenshots below include the pause-control and portrait framing refinements; CI artifacts also capture the build under test.
+Captured from the locally served candidate, not the production domain. The screenshots below are from the 0.9.2 local candidate, including the exterior material/geometry and fog/backdrop refinements; CI artifacts also capture the build under test.
 
 ![Candidate deck, Chromium software WebGL](screenshots/deck-candidate.png)
 
 ![Candidate ocean, Chromium software WebGL](screenshots/ocean-candidate.png)
 
 ![Candidate portrait framing, software WebGL](screenshots/ocean-portrait.png)
+
+![Aurora sail close-up, candidate 0.9.2](screenshots/ocean-sail.png)
 
 ## Reproduce
 

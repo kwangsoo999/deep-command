@@ -1,4 +1,4 @@
-# Project status — 0.9.1 campaign build
+# Project status — 0.9.2 campaign build
 
 The playable single-player MVP is implemented with a complete campaign loop; final beta certification is incomplete. Read RELEASE_READINESS.md for scope and gates.
 
@@ -12,6 +12,8 @@ Implemented: one vessel, one fictional map/three regions, five contacts, five mi
 | 04 Content | Authored procedural scenes/materials/postprocessing | Final GLB/PBR art/animated crew/voice/cinematics; hardware FPS profiling; Chromium software-render smoke has passed |
 | 05 Release | Build/unit/DOM/API, HTTP/PostgreSQL and container smoke QA, CI, docs | Non-Chromium/physical-device matrix, production Podman/VPS checks, production backup/security/load review |
 
-The owner's tank.daitan.site was previously read-only verified at v0.3.0 with working API routing. This task does not have VPS SSH access and did not update that deployment. Local container checks are separate from production acceptance.
+On 2026-11-14, tank.daitan.site returned API version 0.9.0 and still served the pre-0.9.1 viewer (no immersive control); three viewport render/picking checks passed on that baseline. This task does not have VPS SSH access and did not update that deployment. Local container checks are separate from production acceptance.
 
 0.9.1 adds actual live/candidate browser evidence and CI: five missions, persistence reload, six rendered viewport/quality scene checks, physical console picking and one context-loss recovery. See BROWSER_QA.md for scope and limitations.
+
+0.9.2 refines exterior materials, swept control surfaces, access panels/sail identity, shared seabed relief and fog/backdrop color consistency. Bow/sail/stern and all three looks are included in browser QA. Save/gameplay contracts remain unchanged.

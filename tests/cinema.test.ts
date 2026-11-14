@@ -29,6 +29,12 @@ describe("Presentation pipeline ownership", () => {
     } as unknown as T.WebGLRenderer;
     const scene = new T.Scene();
     scene.fog = new T.FogExp2(0x123456);
+    const backdrop = new T.Mesh(
+      new T.SphereGeometry(1),
+      new T.MeshBasicMaterial(),
+    );
+    backdrop.name = "ocean-backdrop";
+    scene.add(backdrop);
     const camera = new T.PerspectiveCamera(),
       cinema = createCinema(renderer, scene, camera, false);
     cinema.render("abyss", 1.5);
@@ -37,6 +43,12 @@ describe("Presentation pipeline ownership", () => {
       1.5 * looks.abyss.exposure,
     );
     expect(mock.passes).toHaveLength(0);
+    for (const look of ["cinema", "natural", "abyss"] as const) {
+      cinema.render(look, 1.25);
+      expect(backdrop.material.color.equals(scene.fog.color)).toBe(true);
+    }
+    backdrop.geometry.dispose();
+    backdrop.material.dispose();
     cinema.dispose();
   });
   it("orders render/bloom/grade/output, disables natural bloom and releases each pass", () => {

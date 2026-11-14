@@ -1,4 +1,4 @@
-# Release readiness — campaign build 0.9.1
+# Release readiness — campaign build 0.9.2
 
 This build closes the playable single-player campaign loop. It is not certified as the full realistic beta described in the original multi-phase document. No percentage completion is assigned.
 

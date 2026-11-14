@@ -63,7 +63,16 @@ describe("Procedural surface assets", () => {
 });
 describe("Underwater dressing lifecycle", () => {
   it("adds terrain/instanced rocks, responds to navigation without changing gameplay and disposes reflection map", () => {
-    const a = createAssembly("ocean", false);
+    const a = createAssembly(
+      "ocean",
+      false,
+      () =>
+        ({
+          width: 0,
+          height: 0,
+          getContext: () => null,
+        }) as unknown as HTMLCanvasElement,
+    );
     const g = createState(),
       before = serialize(g);
     expect(a.scene.getObjectByName("seabed")).toBeTruthy();

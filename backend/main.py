@@ -67,7 +67,7 @@ class BodyLimitMiddleware:
             return await receive()
         await self.app(scope, replay, send)
 
-app = FastAPI(title='DEEP COMMAND API', version='0.9.1')
+app = FastAPI(title='DEEP COMMAND API', version='0.9.2')
 app.add_middleware(BodyLimitMiddleware)
 app.add_middleware(CORSMiddleware, allow_origins=os.getenv('CORS_ORIGINS','http://localhost:5173,http://localhost:8080').split(','),allow_methods=['GET','POST','PUT','DELETE'],allow_headers=['Authorization','Content-Type'])
 bearer = HTTPBearer(auto_error=False)
@@ -127,7 +127,7 @@ def health(session: Session=Depends(db)):
     return {'status':'ok'}
 @app.get('/api/version')
 def version():
-    return {'version':'0.9.1','stage':'alpha','simulation':'fictional','frontend_mode':'local-first'}
+    return {'version':'0.9.2','stage':'alpha','simulation':'fictional','frontend_mode':'local-first'}
 @app.post('/api/auth/register',status_code=201,dependencies=[Depends(limit)])
 def register(data: AuthInput,session: Session=Depends(db)):
     username=data.username.lower()

@@ -6,8 +6,15 @@ export function createSurfaceMaps(high: boolean, kind: "steel" | "acoustic") {
     normal = new Uint8Array(size * size * 4),
     roughness = new Uint8Array(size * size * 4);
   const height = (x: number, y: number) => {
-    const row = Math.floor(y / 16),
-      px = (((x + (kind === "acoustic" ? (row % 2) * 16 : 0)) % 32) + 32) % 32,
+    if (kind === "acoustic") {
+      const u = (x / size) * 12,
+        v = (y / size) * 28;
+      const row = Math.floor(v);
+      const px = (((u + (row % 2) * 0.5) % 1) + 1) % 1;
+      const py = ((v % 1) + 1) % 1;
+      return px < 0.07 || py < 0.07 ? -0.035 : 0;
+    }
+    const px = ((x % 32) + 32) % 32,
       py = ((y % 16) + 16) % 16;
     return px < 1 || py < 1 ? -0.4 : 0.02 * Math.sin(x * 3.1 + y * 7.7);
   };
@@ -23,8 +30,8 @@ export function createSurfaceMaps(high: boolean, kind: "steel" | "acoustic") {
             ? 80
             : 178 + noise * 18
           : seam
-            ? 35
-            : 116 + noise * 12;
+            ? 136
+            : 150 + noise * 5;
       albedo.set([value, value, value, 255], i);
       const n = new T.Vector3(
         (height(x - 1, y) - height(x + 1, y)) * 0.8,
@@ -46,7 +53,7 @@ export function createSurfaceMaps(high: boolean, kind: "steel" | "acoustic") {
   const texture = (data: Uint8Array, color = false) => {
     const t = new T.DataTexture(data, size, size, T.RGBAFormat);
     t.wrapS = t.wrapT = T.RepeatWrapping;
-    t.repeat.set(2, 2);
+    t.repeat.set(kind === "acoustic" ? 1 : 2, kind === "acoustic" ? 1 : 2);
     t.magFilter = T.LinearFilter;
     t.minFilter = T.LinearMipmapLinearFilter;
     t.generateMipmaps = true;

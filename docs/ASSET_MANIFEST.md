@@ -12,7 +12,7 @@ No remote image/model/audio downloads or embedded third-party reference images. 
 | interface-icons | lucide-react dependency | SVG | Lucide ISC license; not original game art |
 | typography | src/style.css | System font stack | No downloaded font assets |
 
-Three.js and its code are MIT; React/Zustand/Vite and other packages retain their respective licenses in package metadata. This repository adds no broad open-source license for owner-created game content. Audit third-party licenses again when distributing a packaged release. All screenshots/model renders/FPS remain unverified in this handoff.
+Three.js and its code are MIT; React/Zustand/Vite and other packages retain their respective licenses in package metadata. This repository adds no broad open-source license for owner-created game content. Audit third-party licenses again when distributing a packaged release. Actual Chromium software-render screenshots are in BROWSER_QA.md; hardware FPS remains unverified.
 
 ## v0.3 additions (source: src/graphics/scenes.ts)
 
@@ -29,3 +29,8 @@ Three.js and its code are MIT; React/Zustand/Vite and other packages retain thei
 ## v0.5 authored geometry and rendering
 
 models.ts generates curved hull, bevel-edged sail and swept blade geometry plus analog gauges. cinema.ts uses Three.js MIT example postprocessing modules (RenderPass, UnrealBloomPass, ShaderPass, OutputPass) and an original color-grade shader. No external models/textures are downloaded. This remains authored procedural game art; actual render quality is unverified.
+
+
+## v0.9.2 original exterior details
+
+Swept beveled fins/rudder (models.ts), dorsal hatches and in-memory CanvasTexture sail lettering (scenes.ts), and vertex-colored seabed with original ripple shader (terrain.ts). All generated locally; no downloaded art, font or model. Browser software-render evidence supersedes the historical unverified-render notes above.

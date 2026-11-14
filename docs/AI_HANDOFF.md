@@ -25,7 +25,7 @@ Preserve working core and save schema; add migrations before changing saved stat
 
 ## Current limits
 
-Read BROWSER_QA.md for actual Chromium/SwiftShader campaign/render/picking/context recovery evidence. Hardware FPS/memory, non-Chromium/physical devices, final realistic assets and original advanced GDD systems remain unverified/incomplete. PostgreSQL and Docker smoke evidence exists from 0.9.0. The live baseline was 0.9.0; 0.9.1 still requires owner rollout. No full beta certification.
+Read BROWSER_QA.md for actual Chromium/SwiftShader campaign/render/picking/context recovery evidence. Hardware FPS/memory, non-Chromium/physical devices, final realistic assets and original advanced GDD systems remain unverified/incomplete. PostgreSQL and Docker smoke evidence exists from 0.9.0. The live baseline was still 0.9.0 on 2026-11-14; 0.9.2 requires owner rollout. No full beta certification.
 
 ## How to continue
 
@@ -71,3 +71,10 @@ Read BROWSER_QA.md. This is an existing VPS/repository workflow; automated Playw
 The live 0.9.0 campaign passed via UI (keyboard contact workaround), and candidate passed via mouse selection. Keep contact's full transparent SVG hit rect and stop Space propagation so it does not pause the game. Immersive mode owns focus/Escape and adjusts renderer through ResizeObserver without recreating gameplay. Exterior framing scales with aspect to avoid hull cropping. Production Dockerfile must copy public/ for favicon.
 
 Browser CI runs tests/browser/run.cjs after build, completing the campaign with controlled timers, checking high desktop/low portrait WebGL, real console picking and one injected context loss. No backend account/save writes occur on the live domain. Current GPU evidence is SwiftShader, not hardware FPS, real mobile or cross-browser certification. Do not regress to describing all rendering as untested, or claim full performance certification.
+
+
+## v0.9.2 exterior refinement
+
+terrain.ts owns fictional relief, vertex-colored sand and distance-faded world-space ripples; use seabedHeight for rock placement. Ocean uses a BackSide sphere named ocean-backdrop. cinema.ts copies the current tinted fog color into its material every render: removing this causes a sharp horizon seam, especially in cinema/abyss. Keep it unlit, fog=false, toneMapped=false, depthWrite=false, early renderOrder and within far clip. Three mixes fog after per-material tone mapping in direct/low mode; the backdrop must skip that mapping too. High mode OutputPass maps both together.
+
+Hull tile layout is normalized by texture size so low/high retain visual scale; contrast/normal strength are restrained. models.ts creates swept beveled control surfaces. Sail identity is an original CanvasTexture shared by the two sides and disposed once by disposeScene; CPU ocean tests now inject a canvas factory. No save/API schema change. Browser runner captures all exterior presets/looks on desktop and retains all three viewport, picking, context-loss and campaign checks. Report bufferWidth/bufferHeight are distinct from viewport width/height.

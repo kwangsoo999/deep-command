@@ -10,7 +10,9 @@ import {
   createSailGeometry,
   createBladeGeometry,
   createGauge,
+  createControlPlane,
 } from "./models";
+import { createSeabed, seabedHeight } from "./terrain";
 import type { State } from "../simulation";
 export const stationNames = [
   "Sonar",
@@ -359,6 +361,21 @@ export function createAssembly(
   } else {
     scene.background = new T.Color("#0a3041");
     scene.fog = new T.FogExp2("#0a3041", 0.028);
+    // Fog is mixed after per-material tone mapping in the direct renderer.
+    // Keep the backdrop unlit/unmapped too; OutputPass handles both in high quality.
+    const backdrop = mesh(
+      new T.SphereGeometry(150, 24, 12),
+      new T.MeshBasicMaterial({
+        color: 0x0a3041,
+        side: T.BackSide,
+        fog: false,
+        toneMapped: false,
+        depthWrite: false,
+      }),
+    );
+    backdrop.name = "ocean-backdrop";
+    backdrop.renderOrder = -10;
+    backdrop.castShadow = backdrop.receiveShadow = false;
     scene.add(new T.HemisphereLight(0xa3ccd2, 0x112331, 2.8));
     const sun = new T.DirectionalLight(0xa5e7ef, 3);
     sun.position.set(-12, 18, 5);
@@ -368,7 +385,8 @@ export function createAssembly(
     scene.add(fill);
     const hull = new T.MeshStandardMaterial({
       ...createSurfaceMaps(high, "acoustic"),
-      color: 0x607c86,
+      color: 0x728e98,
+      normalScale: new T.Vector2(0.22, 0.22),
       metalness: 0.18,
       roughness: 0.88,
     });
@@ -377,16 +395,6 @@ export function createAssembly(
     main.rotation.x = Math.PI / 2;
     main.scale.x = 1.13;
     main.name = "aurora-hull";
-    for (let z = -6; z <= 6; z += 1.2) {
-      const seam = mesh(
-        new T.TorusGeometry(1.305, 0.014, 4, 32),
-        dark,
-        0,
-        0,
-        z,
-      );
-      seam.scale.x = 1.13;
-    }
     mesh(createSailGeometry(high), hull, 0, 1.85, -1);
     box(0.7, 0.12, 3, 0, 2.7, -1, dark);
     for (const x of [-0.24, 0.2]) {
@@ -400,13 +408,36 @@ export function createAssembly(
       mast.name = "mast";
     }
     for (const side of [-1, 1]) {
-      const fin = box(1.7, 0.09, 0.85, side * 1.9, 0.1, -4, hull);
-      fin.rotation.y = side * 0.18;
-      box(1.5, 0.1, 0.9, side * 1.4, 0, 7.2, hull);
+      const fin = mesh(
+        createControlPlane(1.75, 1.15, high),
+        hull,
+        side * 1.05,
+        0.1,
+        -4,
+      );
+      fin.scale.x = side;
+      fin.name = "bow-control-plane";
+      const sternFin = mesh(
+        createControlPlane(1.55, 1.2, high),
+        hull,
+        side * 0.55,
+        0,
+        7.2,
+      );
+      sternFin.scale.x = side;
+      sternFin.name = "stern-control-plane";
       for (let i = 0; i < 5; i++)
         box(0.04, 0.13, 0.36, side * 1.42, 0.4, -2 + i * 0.55, rubber);
     }
-    box(0.13, 2.1, 1.1, 0, 0.4, 7.3, hull);
+    const rudder = mesh(
+      createControlPlane(1.65, 1.3, high),
+      hull,
+      0,
+      0.35,
+      7.2,
+    );
+    rudder.rotation.z = Math.PI / 2;
+    rudder.name = "stern-rudder";
     propeller = new T.Group();
     propeller.position.set(0, 0, 8.7);
     scene.add(propeller);
@@ -419,30 +450,51 @@ export function createAssembly(
       blade.rotation.z = (i * Math.PI * 2) / 7;
       propeller.add(blade);
     }
-    // Stylized terrain establishes distance without using real geography.
-    const terrainGeometry = new T.PlaneGeometry(
-      160,
-      160,
-      high ? 64 : 24,
-      high ? 64 : 24,
-    );
-    const terrainPositions = terrainGeometry.attributes.position;
-    for (let i = 0; i < terrainPositions.count; i++)
-      terrainPositions.setZ(
-        i,
-        Math.sin(terrainPositions.getX(i) * 0.12) * 1.2 +
-          Math.cos(terrainPositions.getY(i) * 0.17) * 0.8,
+    // Flush dorsal access panels and sail identity; original fictional markings.
+    for (const z of [-3.5, 2.5]) {
+      const hatch = mesh(
+        new T.CylinderGeometry(0.34, 0.34, 0.045, high ? 32 : 16),
+        dark,
+        0,
+        1.34,
+        z,
       );
-    terrainGeometry.computeVertexNormals();
-    const seabed = mesh(
-      terrainGeometry,
-      new T.MeshStandardMaterial({ color: 0x36494b, roughness: 1 }),
-      0,
-      -13,
-      0,
-    );
-    seabed.rotation.x = -Math.PI / 2;
-    seabed.name = "seabed";
+      hatch.name = "dorsal-hatch";
+      box(0.32, 0.025, 0.04, 0, 1.37, z, steel);
+    }
+    const identity = makeCanvas();
+    identity.width = 512;
+    identity.height = 128;
+    const ink = identity.getContext("2d");
+    if (ink) {
+      ink.clearRect(0, 0, 512, 128);
+      ink.fillStyle = "#b3c3bd";
+      ink.font = "bold 52px monospace";
+      ink.fillText("AURORA", 28, 62);
+      ink.font = "20px monospace";
+      ink.fillText("DCS / 07", 30, 100);
+    }
+    const identityMap = new T.CanvasTexture(identity);
+    identityMap.colorSpace = T.SRGBColorSpace;
+    for (const side of [-1, 1]) {
+      const plate = mesh(
+        new T.PlaneGeometry(1.65, 0.42),
+        new T.MeshStandardMaterial({
+          map: identityMap,
+          transparent: true,
+          depthWrite: false,
+          roughness: 0.9,
+          polygonOffset: true,
+          polygonOffsetFactor: -1,
+        }),
+        side * 0.373,
+        2.04,
+        -1,
+      );
+      plate.rotation.y = (side * Math.PI) / 2;
+      plate.name = "aurora-identity";
+    }
+    scene.add(createSeabed(high));
     const rocks = new T.InstancedMesh(
       new T.IcosahedronGeometry(1, 0),
       new T.MeshStandardMaterial({ color: 0x263b40, roughness: 0.95 }),
@@ -452,7 +504,7 @@ export function createAssembly(
     for (let i = 0; i < rocks.count; i++) {
       const x = Math.sin(i * 23.7) * 45,
         z = Math.cos(i * 17.9) * 45;
-      dummy.position.set(x, -12.5, z);
+      dummy.position.set(x, seabedHeight(x, z) + 0.12, z);
       dummy.scale.set(
         1 + Math.abs(Math.sin(i)) * 2,
         0.4 + Math.abs(Math.cos(i)),

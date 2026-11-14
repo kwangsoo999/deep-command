@@ -56,3 +56,10 @@ Geometry tests check finite positions, subdivision differences and tapered shape
 Actual Chromium/SwiftShader rendering exposed hard light-shaft edges, excessive dark fill/reflection striping and portrait cropping. Shafts now fade by view-normal angle/height; ocean surface includes Three fog chunks; reflection strips are reduced for the ocean environment. Fill lights and CSS overlay opacity were adjusted. Exterior default camera is closer with a tighter lens; narrow aspect scales distance and widens lens, while deck widens its portrait lens.
 
 Immersive panel expands within the browser viewport, traps focus, exits with Escape and has direct pause/resume. Renderer resources are resized rather than recreated for expansion. See BROWSER_QA.md for actual shader/control/screenshot evidence; earlier unverified-render statements above are historical. Hardware FPS and broad device coverage remain open.
+
+
+## 0.9.2 exterior refinement
+
+The acoustic map uses lower-contrast staggered tiles with the same normalized layout at both quality settings; hull tangent normal strength is reduced. Constant-radius torus rings were removed because they separated from tapered sections. Swept beveled control planes/rudder, dorsal access hatches and a generated AURORA/DCS 07 sail marking add original fictional detail.
+
+terrain.ts shares relief with rock placement, uses vertex colors for sand/ridges and a world-space ripple shader fading with view distance. Ocean backdrop is unlit, toneMapped=false geometry matching fog in the direct renderer; high mode OutputPass maps both together. cinema.ts synchronizes it with the tinted fog for every look; a fixed backdrop color had left a visible edge at the terrain horizon. No new simulation fields or third-party assets. Browser evidence is recorded in BROWSER_QA.md; no hardware FPS guarantee.

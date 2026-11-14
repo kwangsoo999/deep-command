@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.2 — 2026-11-14 / exterior art refinement
+
+- Reworked acoustic tiles with lower seam contrast and stable high/low tiling; removed detached constant-radius hull rings.
+- Replaced box fins/rudder with swept beveled surfaces; added dorsal access hatches and original Aurora sail markings.
+- Added shared fictional seabed relief/rock placement, vertex-color sand and distance-faded ripple shading.
+- Matched distant backdrop to the fog through all three looks/exposure paths, removing the sharp terrain horizon.
+- Extended browser evidence to bow/sail/stern presets and all three looks; report distinguishes viewport and canvas buffer sizes. Save schema/gameplay unchanged.
+
 ## 0.9.1 — 2026-11-13 / browser-led visual fixes
 
 - Tested deployed 0.9.0 in actual Chromium, completed five missions and restored persisted campaign using keyboard contact selection as a baseline workaround.

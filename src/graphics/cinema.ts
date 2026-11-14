@@ -49,6 +49,12 @@ export function createCinema(
   high: boolean,
 ) {
   const baseFog = scene.fog?.color.clone();
+  const backdrop = scene.getObjectByName("ocean-backdrop");
+  const atmosphere =
+    backdrop instanceof T.Mesh &&
+    backdrop.material instanceof T.MeshBasicMaterial
+      ? backdrop.material
+      : undefined;
   let composer: EffectComposer | undefined,
     bloom: UnrealBloomPass | undefined,
     grade: ShaderPass | undefined,
@@ -76,6 +82,7 @@ export function createCinema(
         scene.fog.color
           .copy(baseFog)
           .lerp(new T.Color(p.tint), look === "natural" ? 0 : 0.12);
+      if (atmosphere && scene.fog) atmosphere.color.copy(scene.fog.color);
       if (bloom) {
         bloom.enabled = p.bloom > 0;
         bloom.strength = p.bloom;

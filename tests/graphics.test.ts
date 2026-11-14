@@ -10,6 +10,7 @@ import {
 } from "../src/graphics/scenes";
 import { createState, serialize } from "../src/simulation";
 const context = () => ({
+  clearRect: vi.fn(),
   fillRect: vi.fn(),
   fillText: vi.fn(),
   beginPath: vi.fn(),
